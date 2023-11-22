@@ -1,6 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-
 import type Koa from 'koa'
 import type KoaRouter from '@koa/router'
 
@@ -11,8 +10,8 @@ function useRoutes(app: Koa) {
     if (file === currentFile) return
 
     const router: KoaRouter = require(`./${file}`)
-    app.use(router.routes())
-    app.use(router.allowedMethods())
+    router.routes && app.use(router.routes())
+    router.allowedMethods && app.use(router.allowedMethods())
   })
 }
 
