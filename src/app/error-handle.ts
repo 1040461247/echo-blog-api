@@ -4,6 +4,7 @@ import {
   PASSWORD_ERROR,
   USER_ALREADY_EXISTS,
   UNAUTHORIZATION,
+  DATABASE_ERROR
 } from '../config/error-types.config'
 import type { DefaultContext } from 'koa'
 
@@ -32,13 +33,17 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
       status = 401
       msg = '未授权，请先登录'
       break
+    case DATABASE_ERROR:
+      status = 500
+      msg = '数据库错误，请检查查询参数'
+      break
   }
 
   ctx.type = 'json'
   ctx.status = Number(status)
   ctx.body = {
     code: Number(status),
-    msg: msg,
+    msg: msg
   }
 }
 

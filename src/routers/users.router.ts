@@ -2,12 +2,15 @@ import KoaRouter from '@koa/router'
 import usersController from '../controllers/users.controller'
 import { verifyRegisterInfo, encrypPwd } from '../middlewares/users.middleware'
 
+const usersRouter = new KoaRouter({ prefix: '/users' })
+const { create, list } = usersController
+
 /**
  * @swagger
  * /users:
  *   post:
- *     summary: 用户注册
  *     tags: [Users]
+ *     summary: 用户注册
  *     requestBody:
  *       required: true
  *       content:
@@ -25,10 +28,17 @@ import { verifyRegisterInfo, encrypPwd } from '../middlewares/users.middleware'
  *       200:
  *         description: 用户注册成功
  */
-
-const usersRouter = new KoaRouter({ prefix: '/users' })
-const { create } = usersController
-
 usersRouter.post('/', verifyRegisterInfo, encrypPwd, create)
+/**
+ * @swagger
+ * /users:
+ *  get:
+ *    tags: [Users]
+ *    summary: 获取用户列表
+ *    responses:
+ *      200:
+ *        description: 返回用户列表
+ */
+usersRouter.get('/', list)
 
 module.exports = usersRouter

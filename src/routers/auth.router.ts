@@ -19,8 +19,8 @@ const { login, success } = authController
  * @swagger
  * /login:
  *   post:
- *     summary: 用户登录
  *     tags: [Auth]
+ *     summary: 用户登录
  *     requestBody:
  *       required: true
  *       content:
@@ -43,8 +43,8 @@ authRouter.post('/login', verifyAccount, login)
  * @swagger
  * /authorized:
  *   get:
- *     summary: 用户鉴权
  *     tags: [Auth]
+ *     summary: 用户鉴权
  *     security:
  *      - bearerAuth: []
  *     responses:
