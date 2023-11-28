@@ -11,8 +11,6 @@ import md5Encryp from '../utils/md5-encryp'
 import { verifyToken } from '../utils/authorization'
 import type { DefaultContext, Middleware } from 'koa'
 import type { IUsers, TResources } from '../types'
-import { IMiddleware } from 'koa-router'
-import { ISuccessOption } from '../app/response-handle'
 
 const verifyAccount: Middleware = async (ctx, next) => {
   // 验证用户名密码是否为空

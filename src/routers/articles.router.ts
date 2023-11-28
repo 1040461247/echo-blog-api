@@ -3,7 +3,7 @@ import articlesController from '../controllers/articles.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
-const { create, list, getArticleById } = articlesController
+const { create, list, getArticleById, illustration } = articlesController
 
 /**
  * @swagger
@@ -81,5 +81,22 @@ articlesRouter.get('/', list)
  *        description: 返回id对应文章
  */
 articlesRouter.get('/:articleId', getArticleById)
+/**
+ * @swagger
+ * /articles/illustration/{filename}:
+ *  get:
+ *    tags: [Articles]
+ *    summary: 获取文章配图
+ *    parameters:
+ *      - in: path
+ *        name: filename
+ *        required: true
+ *        schema:
+ *          type: string
+ *    responses:
+ *      200:
+ *        description: 返回文章配图
+ */
+articlesRouter.get('/illustration/:filename', illustration)
 
 module.exports = articlesRouter

@@ -27,6 +27,21 @@ class FileController {
       ctx.fail(error)
     }
   }
+
+  async createIllustration(ctx: DefaultContext) {
+    const files = ctx.req.files
+    const { articleId } = ctx.query
+
+    try {
+      for (const file of files) {
+        const { filename, mimetype, size } = file
+        await fileService.createIllustration(filename, mimetype, size, articleId)
+      }
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
 }
 
 export default new FileController()

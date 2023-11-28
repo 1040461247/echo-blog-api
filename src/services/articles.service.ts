@@ -1,5 +1,6 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
+import type { RowDataPacket } from 'mysql2'
 
 class ArticlesService {
   async create(title: string, content: string, user_id: number, album_url = '') {
@@ -39,6 +40,16 @@ class ArticlesService {
       `
       const [res] = await connection.execute(statement, [articleId])
       return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getIllustrationByFilename(filename: string) {
+    try {
+      const statement = `SELECT * FROM file_illustration WHERE filename = ?;`
+      const [res] = (await connection.execute(statement, [filename])) as RowDataPacket[]
+      return res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

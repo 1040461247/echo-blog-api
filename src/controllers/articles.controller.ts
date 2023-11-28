@@ -1,4 +1,6 @@
+import fs from 'fs'
 import articlesService from '../services/articles.service'
+import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { IArticles } from '../types'
@@ -33,6 +35,18 @@ class ArticlesController {
     try {
       const queryRes = (await articlesService.getArticleById(articleId)) as RowDataPacket[]
       ctx.success(queryRes[0])
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async illustration(ctx: DefaultContext) {
+    const { filename } = ctx.params
+
+    try {
+      const queryRes = (await articlesService.getIllustrationByFilename(filename)) as RowDataPacket
+      ctx.response.set('content-type', queryRes.mimetype)
+      ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${filename}`)
     } catch (error: any) {
       ctx.fail(error)
     }

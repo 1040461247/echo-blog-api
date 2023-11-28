@@ -20,6 +20,15 @@ class FileService {
       throw new Error(DATABASE_ERROR)
     }
   }
+  async createIllustration(filename: string, mimetype: string, size: number, article_id: number) {
+    try {
+      const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id) VALUES (?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [filename, mimetype, size, article_id])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
 }
 
 export default new FileService()
