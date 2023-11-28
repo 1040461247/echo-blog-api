@@ -1,9 +1,9 @@
 import KoaRouter from '@koa/router'
 import articlesCommentsController from '../controllers/articles-comments.controller'
-import { verifyAuth } from '../middlewares/auth.middleware'
+import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
-const { create, reply } = articlesCommentsController
+const { create, reply, update, remove, getCommentsById } = articlesCommentsController
 
 /**
  * @swagger
@@ -78,5 +78,67 @@ ArticlesCommentsRouter.post('/', verifyAuth, create)
  *        description: 回复成功
  */
 ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, reply)
+/**
+ * @swagger
+ * /articles-comments/{commentId}:
+ *  patch:
+ *    tags: [Articles Comments]
+ *    summary: 修改评论
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: commentId
+ *        required: true
+ *        example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              content:
+ *                type: string
+ *                example: php是世界上最好的语言
+ *    responses:
+ *      200:
+ *        description: 修改成功
+ */
+ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articles_comments'), update)
+/**
+ * @swagger
+ * /articles-comments/{commentId}:
+ *  delete:
+ *    tags: [Articles Comments]
+ *    summary: 删除评论
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: commentId
+ *        required: true
+ *    responses:
+ *      200:
+ *        description: 删除成功
+ */
+ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('articles_comments'), remove)
+/**
+ * @swagger
+ * /articles-comments:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据文章id获取评论
+ *    parameters:
+ *      - in: query
+ *        name: article_id
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/', getCommentsById)
 
 module.exports = ArticlesCommentsRouter

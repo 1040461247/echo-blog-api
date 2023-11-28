@@ -1,3 +1,5 @@
+type TResources = 'users' | 'articles' | 'articles_comments'
+
 interface IUsers {
   id?: number
   name: string
@@ -27,4 +29,4 @@ interface IArticlesComments {
   update_time?: string
 }
 
-export { IUsers, IArticles, IArticlesComments }
+export { TResources, IUsers, IArticles, IArticlesComments }

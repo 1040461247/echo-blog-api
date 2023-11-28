@@ -31,6 +31,40 @@ class ArticlesCommentsController {
       ctx.fail(error)
     }
   }
+
+  async update(ctx: DefaultContext) {
+    const { commentId } = ctx.params
+    const { content } = ctx.request.body
+
+    try {
+      await articlesCommentsService.update(content, commentId)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async remove(ctx: DefaultContext) {
+    const { commentId } = ctx.params
+
+    try {
+      await articlesCommentsService.remove(commentId)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getCommentsById(ctx: DefaultContext) {
+    const { article_id } = ctx.query
+
+    try {
+      const queryRes = await articlesCommentsService.getCommentsById(article_id)
+      ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
 }
 
 export default new ArticlesCommentsController()

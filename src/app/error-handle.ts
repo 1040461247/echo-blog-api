@@ -4,7 +4,8 @@ import {
   PASSWORD_ERROR,
   USER_ALREADY_EXISTS,
   UNAUTHORIZATION,
-  DATABASE_ERROR
+  DATABASE_ERROR,
+  NO_PERMISSION
 } from '../config/error-types.config'
 import type { DefaultContext } from 'koa'
 
@@ -36,6 +37,10 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
     case DATABASE_ERROR:
       status = 500
       msg = '数据库错误，请检查查询参数'
+      break
+    case NO_PERMISSION:
+      status = 401
+      msg = '当前用户没有操作权限'
       break
   }
 
