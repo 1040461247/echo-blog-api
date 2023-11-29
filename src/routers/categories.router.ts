@@ -30,7 +30,7 @@ const { create, list, remove } = categoriesController
  *          schema:
  *            type: object
  *            properties:
- *              tag:
+ *              category:
  *                type: string
  *                example: JavaScript
  *    responses:
@@ -64,7 +64,7 @@ categoriesRouter.get('/', list)
  *          schema:
  *            type: object
  *            properties:
- *              tag:
+ *              category:
  *                type: string
  *                example: JavaScript
  *    responses:

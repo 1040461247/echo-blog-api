@@ -2,16 +2,16 @@ import categoriesService from '../services/categories.service'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
 
-class TagsController {
+class CategoriesController {
   async create(ctx: DefaultContext) {
-    const { tag } = ctx.request.body
+    const { category } = ctx.request.body
 
     try {
-      const hasTag = await categoriesService.hasTag(tag)
-      if (hasTag) {
+      const hasCategory = await categoriesService.hasCategory(category)
+      if (hasCategory) {
         return ctx.success(undefined, { msg: '分类已存在' })
       } else {
-        const insertRes = (await categoriesService.create(tag)) as OkPacketParams
+        const insertRes = (await categoriesService.create(category)) as OkPacketParams
         ctx.success({ insertId: insertRes.insertId })
       }
     } catch (error: any) {
@@ -29,10 +29,10 @@ class TagsController {
   }
 
   async remove(ctx: DefaultContext) {
-    const { tag } = ctx.request.body
+    const { category } = ctx.request.body
 
     try {
-      await categoriesService.remove(tag)
+      await categoriesService.remove(category)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)
@@ -40,4 +40,4 @@ class TagsController {
   }
 }
 
-export default new TagsController()
+export default new CategoriesController()
