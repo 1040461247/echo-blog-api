@@ -1,9 +1,9 @@
 import KoaRouter from '@koa/router'
-import tagsController from '../controllers/tags.controller'
+import categoriesController from '../controllers/categories.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
-const tagsRouter = new KoaRouter({ prefix: '/tags' })
-const { create, list, remove } = tagsController
+const categoriesRouter = new KoaRouter({ prefix: '/categories' })
+const { create, list, remove } = categoriesController
 
 /**
  * @swagger
@@ -17,10 +17,10 @@ const { create, list, remove } = tagsController
 
 /**
  * @swagger
- * /tags:
+ * /categories:
  *  post:
- *    tags: [Tags]
- *    summary: 新建标签
+ *    tags: [Categories]
+ *    summary: 新建分类
  *    security:
  *      - bearerAuth: []
  *    requestBody:
@@ -37,24 +37,24 @@ const { create, list, remove } = tagsController
  *      200:
  *        description: 新建成功
  */
-tagsRouter.post('/', verifyAuth, create)
+categoriesRouter.post('/', verifyAuth, create)
 /**
  * @swagger
- * /tags:
+ * /categories:
  *  get:
- *    tags: [Tags]
- *    summary: 获取标签列表
+ *    tags: [Categories]
+ *    summary: 获取分类列表
  *    responses:
  *      200:
- *        description: 返回标签列表
+ *        description: 返回分类列表
  */
-tagsRouter.get('/', list)
+categoriesRouter.get('/', list)
 /**
  * @swagger
- * /tags:
+ * /categories:
  *  delete:
- *    tags: [Tags]
- *    summary: 删除标签
+ *    tags: [Categories]
+ *    summary: 删除分类
  *    security:
  *      - bearerAuth: []
  *    requestBody:
@@ -71,6 +71,6 @@ tagsRouter.get('/', list)
  *      200:
  *        description: 删除成功
  */
-tagsRouter.delete('/', verifyAuth, remove)
+categoriesRouter.delete('/', verifyAuth, remove)
 
-module.exports = tagsRouter
+module.exports = categoriesRouter

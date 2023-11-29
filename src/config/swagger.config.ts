@@ -2,8 +2,6 @@ import path from 'path'
 import swaggerJSDoc from 'swagger-jsdoc'
 import { APP_HOST, APP_PORT } from './env.config'
 
-// 合并不同模块的swagger配置
-
 const swaggerDefinition = {
   openapi: '3.0.0',
   info: {
@@ -19,7 +17,5 @@ const options = {
   apis: [path.join(__dirname, '../routers/*.ts')]
 }
 
-const swaggerSpec = swaggerJSDoc({
-  ...options
-}) as Record<string, unknown>
+const swaggerSpec = swaggerJSDoc(options) as Record<string, unknown>
 export default swaggerSpec

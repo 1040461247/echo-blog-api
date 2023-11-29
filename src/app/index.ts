@@ -16,10 +16,11 @@ app.use(responseHandle)
 app.use(bodyparser())
 app.use(
   koaSwagger({
-    routePrefix: '/swagger',
+    routePrefix: '/api',
     swaggerOptions: {
-      spec: swaggerSpec,
+      spec: swaggerSpec
     },
+    hideTopbar: true
   })
 )
 useRoutes(app)

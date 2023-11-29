@@ -40,7 +40,6 @@ const { createAvatar, createIllustration } = fileController
  *        description: 上传成功
  */
 fileRouter.post('/avatar', verifyAuth, avatarHandler, createAvatar)
-
 /**
  * @swagger
  * /upload/illustration:
