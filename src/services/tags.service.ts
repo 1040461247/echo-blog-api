@@ -33,10 +33,10 @@ class TagsService {
     }
   }
 
-  async remove(tag: string) {
+  async remove(tagId: number) {
     try {
-      const statement = `DELETE FROM tags WHERE name = ?;`
-      const [res] = await connection.execute(statement, [tag])
+      const statement = `DELETE FROM tags WHERE id = ?;`
+      const [res] = await connection.execute(statement, [tagId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)

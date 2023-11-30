@@ -29,10 +29,11 @@ class TagsController {
   }
 
   async remove(ctx: DefaultContext) {
-    const { tag } = ctx.request.body
+    // const { tag } = ctx.request.body
+    const { tagId } = ctx.params
 
     try {
-      await tagsService.remove(tag)
+      await tagsService.remove(tagId)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

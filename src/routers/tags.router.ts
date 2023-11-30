@@ -51,26 +51,21 @@ tagsRouter.post('/', verifyAuth, create)
 tagsRouter.get('/', list)
 /**
  * @swagger
- * /tags:
+ * /tags/{tagId}:
  *  delete:
  *    tags: [Tags]
  *    summary: 删除标签
  *    security:
  *      - bearerAuth: []
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              tag:
- *                type: string
- *                example: JavaScript
+ *    parameters:
+ *      - in: path
+ *        name: tagId
+ *        required: true
+ *        example: 2
  *    responses:
  *      200:
- *        description: 删除成功
+ *        description: success
  */
-tagsRouter.delete('/', verifyAuth, remove)
+tagsRouter.delete('/:tagId', verifyAuth, remove)
 
 module.exports = tagsRouter

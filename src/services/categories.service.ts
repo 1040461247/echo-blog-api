@@ -33,10 +33,10 @@ class CategoriesService {
     }
   }
 
-  async remove(category: string) {
+  async remove(categoryId: number) {
     try {
-      const statement = `DELETE FROM categories WHERE name = ?;`
-      const [res] = await connection.execute(statement, [category])
+      const statement = `DELETE FROM categories WHERE id = ?;`
+      const [res] = await connection.execute(statement, [categoryId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)

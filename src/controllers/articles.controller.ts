@@ -51,6 +51,10 @@ class ArticlesController {
       ctx.fail(error)
     }
   }
+
+  async articleCover(ctx: DefaultContext) {
+
+  }
 }
 
 export default new ArticlesController()

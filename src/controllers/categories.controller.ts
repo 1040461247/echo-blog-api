@@ -29,10 +29,10 @@ class CategoriesController {
   }
 
   async remove(ctx: DefaultContext) {
-    const { category } = ctx.request.body
+    const { categoryId } = ctx.params
 
     try {
-      await categoriesService.remove(category)
+      await categoriesService.remove(categoryId)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

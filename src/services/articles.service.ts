@@ -54,6 +54,10 @@ class ArticlesService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
+  async getArticleCoverById(articleId: number) {
+
+  }
 }
 
 export default new ArticlesService()

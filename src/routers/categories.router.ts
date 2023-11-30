@@ -51,26 +51,21 @@ categoriesRouter.post('/', verifyAuth, create)
 categoriesRouter.get('/', list)
 /**
  * @swagger
- * /categories:
+ * /categories/{categoryId}:
  *  delete:
  *    tags: [Categories]
  *    summary: 删除分类
  *    security:
  *      - bearerAuth: []
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              category:
- *                type: string
- *                example: JavaScript
+ *    parameters:
+ *      - in: path
+ *        name: categoryId
+ *        required: true
+ *        example: 2
  *    responses:
  *      200:
- *        description: 删除成功
+ *        description: success
  */
-categoriesRouter.delete('/', verifyAuth, remove)
+categoriesRouter.delete('/:categoryId', verifyAuth, remove)
 
 module.exports = categoriesRouter
