@@ -13,4 +13,7 @@ const illustrationUpload = multer({
 })
 const illustrationHandler = illustrationUpload.array('illustration', 20)
 
-export { avatarHandler, illustrationHandler }
+// 文章封面上传
+const coverHandler = illustrationUpload.single('cover')
+
+export { avatarHandler, illustrationHandler, coverHandler }

@@ -45,15 +45,27 @@ class ArticlesController {
 
     try {
       const queryRes = (await articlesService.getIllustrationByFilename(filename)) as RowDataPacket
-      ctx.response.set('content-type', queryRes.mimetype)
-      ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${filename}`)
+      if (queryRes) {
+        ctx.response.set('content-type', queryRes.mimetype)
+        ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${filename}`)
+      }
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
   async articleCover(ctx: DefaultContext) {
+    const { articleId } = ctx.params
 
+    try {
+      const queryRes = await articlesService.getArticleCoverById(articleId) as RowDataPacket
+      if (queryRes) {
+        ctx.response.set('content-type', queryRes.mimetype)
+        ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
+      }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
   }
 }
 

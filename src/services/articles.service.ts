@@ -56,7 +56,13 @@ class ArticlesService {
   }
 
   async getArticleCoverById(articleId: number) {
-
+    try {
+      const statement = `SELECT * FROM file_illustration WHERE article_id = ? AND is_cover = 1;`
+      const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
+      return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
   }
 }
 

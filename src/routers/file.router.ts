@@ -1,10 +1,10 @@
 import KoaRouter from '@koa/router'
 import fileController from '../controllers/file.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
-import { avatarHandler, illustrationHandler } from '../middlewares/file.middleware'
+import { avatarHandler, illustrationHandler, coverHandler } from '../middlewares/file.middleware'
 
 const fileRouter = new KoaRouter({ prefix: '/upload' })
-const { createAvatar, createIllustration } = fileController
+const { createAvatar, createIllustration, createCover } = fileController
 
 /**
  * @swagger
@@ -70,5 +70,34 @@ fileRouter.post('/avatar', verifyAuth, avatarHandler, createAvatar)
  *        description: 上传成功
  */
 fileRouter.post('/illustration', verifyAuth, illustrationHandler, createIllustration)
+/**
+ * @swagger
+ * /upload/{articleId}/cover:
+ *  post:
+ *    tags: [Upload]
+ *    summary:
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        required: true
+ *        example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        multipart/form-data:
+ *          schema:
+ *            properties:
+ *              cover:
+ *                type: array
+ *                items:
+ *                  type: string
+ *                  format: binary
+ *    responses:
+ *      200:
+ *        description: success
+ */
+fileRouter.post('/:articleId/cover', verifyAuth, coverHandler, createCover)
 
 module.exports = fileRouter
