@@ -5,6 +5,7 @@ import articlesService from '../services/articles.service'
 import { AVATAR_PATH, ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
+import type { IFileAvatar, IFileIllustration } from '../types'
 
 class FileController {
   async createAvatar(ctx: DefaultContext) {
@@ -12,8 +13,7 @@ class FileController {
     const { id } = ctx.user!
 
     try {
-      const uesrAvatar = await userService.getAvatarById(id!)
-      console.log(uesrAvatar)
+      const uesrAvatar = await userService.getAvatarById(id!) as IFileAvatar
       if (uesrAvatar) {
         // 头像已存在，删除源文件并更新
         await fs.unlink(`${AVATAR_PATH}/${uesrAvatar.filename}`)
@@ -49,15 +49,16 @@ class FileController {
     const { articleId } = ctx.params
 
     try {
-      const articleCover = await articlesService.getArticleCoverById(articleId)
+      const articleCover = await articlesService.getArticleCoverById(articleId) as IFileIllustration
       if (articleCover) {
-        // 头像已存在，删除源文件并更新
+        // 封面已存在，删除源文件并更新
         await fs.unlink(`${ILLUSTRATION_PATH}/${articleCover.filename}`)
-        await fileService.updateAvatar(filename, mimetype, size, id!)
+        await fileService.updateCover(filename, mimetype, size, articleId)
         ctx.success()
       } else {
-        // 新增头像
-        const insertRes = (await fileService.createAvatar(filename, mimetype, size, id!)) as OkPacketParams
+        // 新增封面
+        const insertRes = (await fileService.createCover(filename, mimetype, size, articleId)) as OkPacketParams
+        await articlesService.updateArticleCover(articleId)
         ctx.success({ insertId: insertRes.insertId })
       }
     } catch (error: any) {

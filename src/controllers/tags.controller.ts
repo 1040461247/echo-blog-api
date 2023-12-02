@@ -1,6 +1,7 @@
 import tagsService from '../services/tags.service'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
+import type { ITags } from '../types'
 
 class TagsController {
   async create(ctx: DefaultContext) {
@@ -21,7 +22,7 @@ class TagsController {
 
   async list(ctx: DefaultContext) {
     try {
-      const queryRes = await tagsService.getList()
+      const queryRes = await tagsService.getList() as ITags[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -29,7 +30,6 @@ class TagsController {
   }
 
   async remove(ctx: DefaultContext) {
-    // const { tag } = ctx.request.body
     const { tagId } = ctx.params
 
     try {

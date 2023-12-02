@@ -59,7 +59,7 @@ class ArticlesCommentsController {
     const { article_id } = ctx.query
 
     try {
-      const queryRes = await articlesCommentsService.getCommentsById(article_id)
+      const queryRes = await articlesCommentsService.getCommentsById(article_id) as IArticlesComments[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)

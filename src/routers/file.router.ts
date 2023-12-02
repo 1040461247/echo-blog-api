@@ -75,7 +75,7 @@ fileRouter.post('/illustration', verifyAuth, illustrationHandler, createIllustra
  * /upload/{articleId}/cover:
  *  post:
  *    tags: [Upload]
- *    summary:
+ *    summary: 上传文章封面
  *    security:
  *      - bearerAuth: []
  *    parameters:

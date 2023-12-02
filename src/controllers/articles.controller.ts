@@ -1,9 +1,10 @@
 import fs from 'fs'
 import articlesService from '../services/articles.service'
+import fileService from '../services/file.service'
 import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams, RowDataPacket } from 'mysql2'
-import type { IArticles } from '../types'
+import type { IArticles, IFileIllustration } from '../types'
 
 class ArticlesController {
   async create(ctx: DefaultContext) {
@@ -22,7 +23,7 @@ class ArticlesController {
     const { offset, limit } = ctx.query
 
     try {
-      const queryRes = await articlesService.getList(offset, limit)
+      const queryRes = await articlesService.getList(offset, limit) as IArticles[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -33,7 +34,7 @@ class ArticlesController {
     const { articleId } = ctx.params
 
     try {
-      const queryRes = (await articlesService.getArticleById(articleId)) as RowDataPacket[]
+      const queryRes = (await articlesService.getArticleById(articleId)) as IArticles[]
       ctx.success(queryRes[0])
     } catch (error: any) {
       ctx.fail(error)
@@ -44,7 +45,7 @@ class ArticlesController {
     const { filename } = ctx.params
 
     try {
-      const queryRes = (await articlesService.getIllustrationByFilename(filename)) as RowDataPacket
+      const queryRes = (await articlesService.getIllustrationByFilename(filename)) as IFileIllustration
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
         ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${filename}`)
@@ -58,11 +59,31 @@ class ArticlesController {
     const { articleId } = ctx.params
 
     try {
-      const queryRes = await articlesService.getArticleCoverById(articleId) as RowDataPacket
+      const queryRes = await articlesService.getArticleCoverById(articleId) as IFileIllustration
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
         ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
       }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeCover(ctx: DefaultContext) {
+    const { articleId } = ctx.params
+    const promiseList = []
+
+    try {
+      const queryRes = await articlesService.getArticleCoverById(articleId) as IFileIllustration
+      if (!queryRes) return ctx.success(undefined, { msg: '文章封面不存在' })
+
+      const { filename, article_id } = queryRes
+      promiseList.push( fs.promises.unlink(`${ILLUSTRATION_PATH}/${filename}`) )
+      promiseList.push( fileService.removeCover(articleId) )
+      promiseList.push( articlesService.removeArticleCover(articleId) )
+      await Promise.all(promiseList)
+
+      ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }

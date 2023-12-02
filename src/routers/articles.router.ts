@@ -1,9 +1,9 @@
 import KoaRouter from '@koa/router'
 import articlesController from '../controllers/articles.controller'
-import { verifyAuth } from '../middlewares/auth.middleware'
+import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
-const { create, list, getArticleById, illustration, articleCover } = articlesController
+const { create, list, getArticleById, illustration, articleCover, removeCover } = articlesController
 
 /**
  * @swagger
@@ -115,5 +115,24 @@ articlesRouter.get('/illustration/:filename', illustration)
  *        description: success
  */
 articlesRouter.get('/:articleId/cover', articleCover)
+/**
+ * @swagger
+ * /articles/{articleId}/cover:
+ *  delete:
+ *    tags: [Articles]
+ *    summary: 删除文章封面
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('articles'), removeCover)
 
 module.exports = articlesRouter

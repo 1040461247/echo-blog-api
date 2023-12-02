@@ -1,4 +1,5 @@
 import connection from '../app/database'
+import { APP_HOST, APP_PORT } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 
@@ -58,6 +59,35 @@ class ArticlesService {
   async getArticleCoverById(articleId: number) {
     try {
       const statement = `SELECT * FROM file_illustration WHERE article_id = ? AND is_cover = 1;`
+      const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
+      return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateArticleCover(articleId: number){
+    const coverUrl = `${APP_HOST}:${APP_PORT}/articles/${articleId}/cover`
+    try {
+      const statement = `
+        UPDATE articles
+        SET cover_url = ?
+        WHERE id = ?;
+      `
+      const [res] = (await connection.execute(statement, [coverUrl, articleId])) as RowDataPacket[]
+      return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async removeArticleCover(articleId: number) {
+    try {
+      const statement = `
+        UPDATE articles
+        SET cover_url = null
+        WHERE id = ?;
+      `
       const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
       return res[0]
     } catch (error) {

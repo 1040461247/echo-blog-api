@@ -1,6 +1,7 @@
 import categoriesService from '../services/categories.service'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
+import type { ICategories } from '../types'
 
 class CategoriesController {
   async create(ctx: DefaultContext) {
@@ -21,7 +22,7 @@ class CategoriesController {
 
   async list(ctx: DefaultContext) {
     try {
-      const queryRes = await categoriesService.getList()
+      const queryRes = await categoriesService.getList() as ICategories[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)

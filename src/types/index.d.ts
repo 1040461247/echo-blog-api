@@ -1,4 +1,4 @@
-type TResources = 'users' | 'articles' | 'articles_comments'
+type TResources = 'users' | 'articles' | 'articles_comments' | 'categories' | 'tags' | 'file_avatar' | 'file_illustration'
 
 interface IUsers {
   id?: number
@@ -15,6 +15,9 @@ interface IArticles {
   content: string
   album_url?: string
   user_id?: number
+  category_id?: number
+  is_sticky?: 0 | 1
+  cover_url?: string
   create_time?: string
   update_time?: string
 }
@@ -29,4 +32,38 @@ interface IArticlesComments {
   update_time?: string
 }
 
-export { TResources, IUsers, IArticles, IArticlesComments }
+interface ICategories {
+  id?: number
+  name: string
+  create_time?: string
+  update_time?: string
+}
+
+interface ITags {
+  id?: number
+  name: string
+  create_time?: string
+  update_time?: string
+}
+
+interface IFileAvatar {
+  id?: number
+  filename: string
+  mimetype: string
+  size: number
+  user_id: number
+  create_time?: string
+  update_time?: string
+}
+
+interface IFileIllustration {
+  id?: number
+  filename: string
+  mimetype: string
+  size: number
+  article_id: number
+  create_time?: string
+  update_time?: string
+}
+
+export { TResources, IUsers, IArticles, IArticlesComments, ICategories, ITags, IFileAvatar, IFileIllustration }

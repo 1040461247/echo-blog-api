@@ -5,7 +5,6 @@ class AuthService {
   async hasPermission(resourceName: string, resourceFiledId: number, userId: number) {
     try {
       const statement = `SELECT id FROM ${resourceName} WHERE id = ? AND user_id = ?;`
-      console.log(resourceName, resourceFiledId, userId)
       const [res] = await connection.execute(statement, [resourceFiledId, userId])
       if (Array.isArray(res) && res.length > 0) {
         return true
