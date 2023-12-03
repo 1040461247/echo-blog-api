@@ -6,6 +6,7 @@ import { AVATAR_PATH, ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
 import type { IFileAvatar, IFileIllustration } from '../types'
+import usersService from '../services/users.service'
 
 class FileController {
   async createAvatar(ctx: DefaultContext) {
@@ -22,6 +23,7 @@ class FileController {
       } else {
         // 新增头像
         const insertRes = (await fileService.createAvatar(filename, mimetype, size, id!)) as OkPacketParams
+        await usersService.updateAvatar(id!)
         ctx.success({ insertId: insertRes.insertId })
       }
     } catch (error: any) {

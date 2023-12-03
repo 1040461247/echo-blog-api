@@ -1,6 +1,7 @@
 import fs from 'fs'
 import articlesService from '../services/articles.service'
 import fileService from '../services/file.service'
+import tagsService from '../services/tags.service'
 import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams, RowDataPacket } from 'mysql2'
@@ -8,11 +9,11 @@ import type { IArticles, IFileIllustration } from '../types'
 
 class ArticlesController {
   async create(ctx: DefaultContext) {
-    const { title, content, album_url } = ctx.request.body as IArticles
+    const { title, content, category_id, cover_url, is_sticky } = ctx.request.body as IArticles
     const { id } = ctx.user!
 
     try {
-      const insertRes = (await articlesService.create(title, content, id!, album_url)) as OkPacketParams
+      const insertRes = (await articlesService.create(title, content, id!, cover_url, category_id, is_sticky)) as OkPacketParams
       ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
     } catch (error: any) {
       ctx.fail(error)
@@ -83,6 +84,36 @@ class ArticlesController {
       promiseList.push( articlesService.removeArticleCover(articleId) )
       await Promise.all(promiseList)
 
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async updateCategory(ctx: DefaultContext) {
+    const { articleId } = ctx.params
+    const { categoryId } = ctx.request.body
+
+    try {
+      await articlesService.updateCategory(articleId, categoryId)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createTags(ctx: DefaultContext) {
+    const { articleId } = ctx.params
+    const { tagIds } = ctx.request.body
+    const promiseList = []
+
+    try {
+      await articlesService.clearTags(articleId)
+
+      for (const tagId of tagIds) {
+        promiseList.push( articlesService.createTag(articleId, tagId) )
+      }
+      await Promise.all(promiseList)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

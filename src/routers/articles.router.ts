@@ -3,7 +3,7 @@ import articlesController from '../controllers/articles.controller'
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
-const { create, list, getArticleById, illustration, articleCover, removeCover } = articlesController
+const { create, list, getArticleById, illustration, articleCover, removeCover, updateCategory, createTags } = articlesController
 
 /**
  * @swagger
@@ -36,6 +36,15 @@ const { create, list, getArticleById, illustration, articleCover, removeCover } 
  *              content:
  *                type: string
  *                example: hello world
+ *              category_id:
+ *                type: number
+ *                example: 1
+ *              cover_url:
+ *                type: string
+ *                required: false
+ *              is_sticky:
+ *                type: number
+ *                required: false
  *    responses:
  *      200:
  *        description: 新建成功
@@ -81,6 +90,7 @@ articlesRouter.get('/', list)
  *        description: 返回id对应文章
  */
 articlesRouter.get('/:articleId', getArticleById)
+
 /**
  * @swagger
  * /articles/illustration/{filename}:
@@ -134,5 +144,64 @@ articlesRouter.get('/:articleId/cover', articleCover)
  *        description: success
  */
 articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('articles'), removeCover)
+
+/**
+ * @swagger
+ * /articles/{articleId}/category:
+ *  patch:
+ *    tags: [Articles]
+ *    summary: 修改文章分类
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        required: true
+ *        example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              categoryId:
+ *                type: number
+ *                example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('articles'), updateCategory)
+
+/**
+ * @swagger
+ * /articles/{articleId}/tags:
+ *  post:
+ *    tags: [Articles]
+ *    summary: 添加文章标签
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        required: true
+ *        example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              tagIds:
+ *                type: array
+ *                items:
+ *                  type: number
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTags)
 
 module.exports = articlesRouter

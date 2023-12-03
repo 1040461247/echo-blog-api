@@ -1,5 +1,6 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
+import { APP_HOST, APP_PORT } from '../config/env.config'
 import type { RowDataPacket } from 'mysql2'
 import type { IUsers } from '../types'
 
@@ -40,6 +41,21 @@ class UserService {
     try {
       const statement = `SELECT * FROM file_avatar WHERE user_id = ?;`
       const [res] = (await connection.execute(statement, [userId])) as RowDataPacket[]
+      return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateAvatar(userId: number){
+    const avatar_url = `${APP_HOST}:${APP_PORT}/users/${userId}/avatar`
+    try {
+      const statement = `
+        UPDATE users
+        SET avatar_url = ?
+        WHERE id = ?;
+      `
+      const [res] = (await connection.execute(statement, [avatar_url, userId])) as RowDataPacket[]
       return res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)

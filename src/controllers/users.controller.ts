@@ -35,8 +35,6 @@ class UsersController {
         const { mimetype, filename } = queryInfo
         ctx.response.set('content-type', mimetype)
         ctx.body = fs.createReadStream(`${AVATAR_PATH}/${filename}`)
-      } else {
-        ctx.success(undefined, { msg: '用户头像不存在' })
       }
     } catch (error: any) {
       ctx.fail(error)

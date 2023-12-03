@@ -4,10 +4,10 @@ import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 
 class ArticlesService {
-  async create(title: string, content: string, user_id: number, album_url = '') {
+  async create(title: string, content: string, user_id: number, cover_url = '', category_id: number, is_sticky = 0) {
     try {
-      const statement = `INSERT INTO articles (title, content, user_id, album_url) VALUES (?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [title, content, user_id, album_url])
+      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky) VALUES (?, ?, ?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [title, content, user_id, cover_url, category_id, is_sticky])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -17,10 +17,24 @@ class ArticlesService {
   async getList(offset = 0, limit = 10) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.album_url, atc.create_time, atc.update_time,
-        JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) author
+      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+        JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+          NULLIF(
+              COALESCE(
+                  JSON_ARRAYAGG(
+                      JSON_OBJECT('id', tags.id, 'name', tags.name)
+                  ),
+                  '[{"id": null, "name": null}]'
+              ),
+              '[{"id": null, "name": null}]'
+          ) AS tags
       FROM articles atc
       LEFT JOIN users u ON u.id = atc.user_id
+      LEFT JOIN categories c ON c.id = atc.category_id
+      LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
+      LEFT JOIN tags ON tags.id = art.tag_id
+      GROUP BY atc.id
       LIMIT ?, ?;
     `
       const [res] = await connection.execute(statement, [offset, limit])
@@ -33,11 +47,25 @@ class ArticlesService {
   async getArticleById(articleId: number) {
     try {
       const statement = `
-        SELECT atc.id, atc.title, atc.content, atc.album_url, atc.create_time, atc.update_time,
-          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) author
-        FROM articles atc
-        LEFT JOIN users u ON u.id = atc.user_id
-        WHERE atc.id = ?;
+      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+        JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+          NULLIF(
+              COALESCE(
+                  JSON_ARRAYAGG(
+                      JSON_OBJECT('id', tags.id, 'name', tags.name)
+                  ),
+                  '[{"id": null, "name": null}]'
+              ),
+              '[{"id": null, "name": null}]'
+          ) AS tags
+      FROM articles atc
+      LEFT JOIN users u ON u.id = atc.user_id
+      LEFT JOIN categories c ON c.id = atc.category_id
+      LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
+      LEFT JOIN tags ON tags.id = art.tag_id
+      WHERE atc.id = 1
+      GROUP BY atc.id;
       `
       const [res] = await connection.execute(statement, [articleId])
       return res
@@ -90,6 +118,40 @@ class ArticlesService {
       `
       const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
       return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateCategory(articleId: number, categoryId: number) {
+    try {
+      const statement = `
+        UPDATE articles
+        SET category_id = ?
+        WHERE id = ?;
+      `
+      const [res] = await connection.execute(statement, [categoryId, articleId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createTag(articleId: number, tagId: number) {
+    try {
+      const statement = `INSERT INTO articles_ref_tags (article_id, tag_id) VALUES(?, ?);`
+      const [res] = await connection.execute(statement, [articleId, tagId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async clearTags(articleId: number) {
+    try {
+      const statement = `DELETE FROM articles_ref_tags WHERE article_id = ?;`
+      const [res] = await connection.execute(statement, [articleId])
+      return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
