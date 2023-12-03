@@ -10,7 +10,7 @@ const { create, getUserList, getAvatarById } = userService
 class UsersController {
   async create(ctx: DefaultContext) {
     try {
-      const insertRes = await create(ctx.request.body) as OkPacketParams
+      const insertRes = (await create(ctx.request.body)) as OkPacketParams
       ctx.success(insertRes, { msg: '注册成功' })
     } catch (error: any) {
       ctx.fail(error)
@@ -19,7 +19,7 @@ class UsersController {
 
   async list(ctx: DefaultContext) {
     try {
-      const queryRes = await getUserList() as IUsers[]
+      const queryRes = (await getUserList()) as IUsers[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -30,7 +30,7 @@ class UsersController {
     const { userId } = ctx.params
 
     try {
-      const queryInfo = await getAvatarById(userId) as IFileAvatar
+      const queryInfo = (await getAvatarById(userId)) as IFileAvatar
       if (queryInfo) {
         const { mimetype, filename } = queryInfo
         ctx.response.set('content-type', mimetype)

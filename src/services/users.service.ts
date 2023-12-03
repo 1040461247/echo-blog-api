@@ -47,7 +47,7 @@ class UserService {
     }
   }
 
-  async updateAvatar(userId: number){
+  async updateAvatar(userId: number) {
     const avatar_url = `${APP_HOST}:${APP_PORT}/users/${userId}/avatar`
     try {
       const statement = `

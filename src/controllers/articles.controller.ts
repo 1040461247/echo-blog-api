@@ -13,7 +13,14 @@ class ArticlesController {
     const { id } = ctx.user!
 
     try {
-      const insertRes = (await articlesService.create(title, content, id!, cover_url, category_id, is_sticky)) as OkPacketParams
+      const insertRes = (await articlesService.create(
+        title,
+        content,
+        id!,
+        cover_url,
+        category_id,
+        is_sticky
+      )) as OkPacketParams
       ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
     } catch (error: any) {
       ctx.fail(error)
@@ -24,8 +31,14 @@ class ArticlesController {
     const { offset, limit } = ctx.query
 
     try {
-      const queryRes = await articlesService.getList(offset, limit) as IArticles[]
-      ctx.success(queryRes)
+      const queryRes = (await articlesService.getList(offset, limit)) as any[]
+      // 将tags数组序列化为json
+      const articleList = queryRes.map((item) => {
+        const articleList = { ...item }
+        articleList.tags = JSON.parse(item.tags)
+        return articleList
+      })
+      ctx.success(articleList)
     } catch (error: any) {
       ctx.fail(error)
     }
@@ -35,7 +48,7 @@ class ArticlesController {
     const { articleId } = ctx.params
 
     try {
-      const queryRes = (await articlesService.getArticleById(articleId)) as IArticles[]
+      const queryRes = (await articlesService.getArticleById(articleId)) as any[]
       ctx.success(queryRes[0])
     } catch (error: any) {
       ctx.fail(error)
@@ -60,7 +73,7 @@ class ArticlesController {
     const { articleId } = ctx.params
 
     try {
-      const queryRes = await articlesService.getArticleCoverById(articleId) as IFileIllustration
+      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
         ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
@@ -75,13 +88,13 @@ class ArticlesController {
     const promiseList = []
 
     try {
-      const queryRes = await articlesService.getArticleCoverById(articleId) as IFileIllustration
+      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
       if (!queryRes) return ctx.success(undefined, { msg: '文章封面不存在' })
 
       const { filename, article_id } = queryRes
-      promiseList.push( fs.promises.unlink(`${ILLUSTRATION_PATH}/${filename}`) )
-      promiseList.push( fileService.removeCover(articleId) )
-      promiseList.push( articlesService.removeArticleCover(articleId) )
+      promiseList.push(fs.promises.unlink(`${ILLUSTRATION_PATH}/${filename}`))
+      promiseList.push(fileService.removeCover(articleId))
+      promiseList.push(articlesService.removeArticleCover(articleId))
       await Promise.all(promiseList)
 
       ctx.success()
@@ -111,7 +124,7 @@ class ArticlesController {
       await articlesService.clearTags(articleId)
 
       for (const tagId of tagIds) {
-        promiseList.push( articlesService.createTag(articleId, tagId) )
+        promiseList.push(articlesService.createTag(articleId, tagId))
       }
       await Promise.all(promiseList)
       ctx.success()

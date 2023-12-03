@@ -28,3 +28,4 @@
 [2023-12-02T11:32:52.346] [INFO] http - ::1 - - "DELETE /articles/1/cover HTTP/1.1" 200 28 "http://localhost:8000/api" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 [2023-12-02T11:34:10.709] [INFO] http - ::ffff:127.0.0.1 - - "POST /upload/1/cover HTTP/1.1" 200 50 "" "PostmanRuntime/7.35.0"
 [2023-12-02T11:34:27.093] [INFO] http - ::1 - - "GET /articles/1/cover HTTP/1.1" 200 - "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
+[2023-12-02T12:32:46.723] [INFO] http - ::1 - - "GET /api HTTP/1.1" 200 11248 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
