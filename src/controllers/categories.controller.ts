@@ -22,7 +22,7 @@ class CategoriesController {
 
   async list(ctx: DefaultContext) {
     try {
-      const queryRes = await categoriesService.getList() as ICategories[]
+      const queryRes = (await categoriesService.getList()) as ICategories[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -35,6 +35,27 @@ class CategoriesController {
     try {
       await categoriesService.remove(categoryId)
       ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getCategoryById(ctx: DefaultContext) {
+    const { categoryId } = ctx.params
+
+    try {
+      const queryRes = (await categoriesService.getCategoryById(categoryId)) as ICategories[]
+      ctx.success(queryRes[0])
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getArticlesByCateId(ctx: DefaultContext) {
+    const { categoryId } = ctx.params
+    try {
+      const queryRes = await categoriesService.getArticlesByCateId(categoryId)
+      ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
     }

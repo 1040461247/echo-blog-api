@@ -1,6 +1,6 @@
 import tagsService from '../services/tags.service'
 import type { DefaultContext } from 'koa'
-import type { OkPacketParams } from 'mysql2'
+import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { ITags } from '../types'
 
 class TagsController {
@@ -22,7 +22,7 @@ class TagsController {
 
   async list(ctx: DefaultContext) {
     try {
-      const queryRes = await tagsService.getList() as ITags[]
+      const queryRes = (await tagsService.getList()) as ITags[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -35,6 +35,28 @@ class TagsController {
     try {
       await tagsService.remove(tagId)
       ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getTagById(ctx: DefaultContext) {
+    const { tagId } = ctx.params
+
+    try {
+      const queryRes = (await tagsService.getTagById(tagId)) as ITags[]
+      ctx.success(queryRes[0])
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getArticlesByTagId(ctx: DefaultContext) {
+    const { tagId } = ctx.params
+
+    try {
+      const queryRes = (await tagsService.getArticlesByTagId(tagId)) as RowDataPacket[]
+      ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
     }

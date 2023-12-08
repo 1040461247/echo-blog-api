@@ -42,6 +42,52 @@ class CategoriesService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
+  async getCategoryById(categoryId: number) {
+    try {
+      const statement = `SELECT * FROM categories WHERE id = ?;`
+      const [res] = await connection.execute(statement, [categoryId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticlesByCateId(categoryId: number) {
+    try {
+      const statement = `
+        SELECT atc.id,
+              atc.title,
+              atc.content,
+              atc.cover_url,
+              atc.create_time,
+              atc.update_time,
+              JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+              JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+              NULLIF(
+                  COALESCE(
+                      JSON_ARRAYAGG(
+                          JSON_OBJECT('id', tags.id, 'name', tags.name)
+                      ),
+                      '[{"id": null, "name": null}]'
+                  ),
+                  '[{"id": null, "name": null}]'
+              ) AS tags
+        FROM categories c
+        LEFT JOIN articles atc ON atc.category_id = c.id
+        LEFT JOIN users u ON u.id = atc.user_id
+        LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
+        LEFT JOIN tags ON tags.id = art.tag_id
+        WHERE c.id = ?
+        GROUP BY atc.id, c.id;
+      `
+      const [res] = await connection.execute(statement, [categoryId])
+      return res
+    } catch (error) {
+      console.log(error)
+      throw new Error(DATABASE_ERROR)
+    }
+  }
 }
 
 export default new CategoriesService()

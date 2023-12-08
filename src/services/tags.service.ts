@@ -42,6 +42,43 @@ class TagsService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
+  async getTagById(tagId: number) {
+    try {
+      const statement = `SELECT * FROM tags WHERE id = ?;`
+      const [res] = await connection.execute(statement, [tagId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticlesByTagId(tagId: number) {
+    try {
+      const statement = `
+        SELECT atc.id,
+              atc.title,
+              atc.content,
+              atc.cover_url,
+              atc.create_time,
+              atc.update_time,
+              JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+              JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+              JSON_ARRAYAGG(JSON_OBJECT('id', tags.id, 'name', tags.name)) AS tags
+        FROM articles_ref_tags art
+        LEFT JOIN articles atc ON atc.id = art.article_id
+        LEFT JOIN users u ON u.id = atc.user_id
+        LEFT JOIN categories c ON c.id = atc.category_id
+        LEFT JOIN tags ON tags.id = art.tag_id
+        WHERE art.tag_id = 4
+        GROUP BY atc.id;
+      `
+      const [res] = await connection.execute(statement, [tagId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
 }
 
 export default new TagsService()
