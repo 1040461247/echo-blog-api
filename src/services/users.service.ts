@@ -1,6 +1,6 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
-import { APP_HOST, APP_PORT } from '../config/env.config'
+import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import type { RowDataPacket } from 'mysql2'
 import type { IUsers } from '../types'
 
@@ -48,7 +48,7 @@ class UserService {
   }
 
   async updateAvatar(userId: number) {
-    const avatar_url = `${APP_HOST}:${APP_PORT}/users/${userId}/avatar`
+    const avatar_url = `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}/users/${userId}/avatar`
     try {
       const statement = `
         UPDATE users

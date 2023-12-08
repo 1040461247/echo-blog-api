@@ -1,6 +1,7 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
+import sortArticles from '../utils/sort-articles'
 
 class TagsService {
   async create(tag: string) {
@@ -62,6 +63,7 @@ class TagsService {
               atc.cover_url,
               atc.create_time,
               atc.update_time,
+              atc.is_sticky,
               JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
               JSON_OBJECT('id', c.id, 'name', c.name) AS category,
               JSON_ARRAYAGG(JSON_OBJECT('id', tags.id, 'name', tags.name)) AS tags
@@ -70,11 +72,11 @@ class TagsService {
         LEFT JOIN users u ON u.id = atc.user_id
         LEFT JOIN categories c ON c.id = atc.category_id
         LEFT JOIN tags ON tags.id = art.tag_id
-        WHERE art.tag_id = 4
+        WHERE art.tag_id = ?
         GROUP BY atc.id;
       `
-      const [res] = await connection.execute(statement, [tagId])
-      return res
+      const [res] = (await connection.execute(statement, [tagId])) as RowDataPacket[][]
+      return sortArticles(res)
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

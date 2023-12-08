@@ -1,7 +1,8 @@
 import connection from '../app/database'
-import { APP_HOST, APP_PORT } from '../config/env.config'
+import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
+import sortArticles from '../utils/sort-articles'
 
 class ArticlesService {
   async create(title: string, content: string, user_id: number, cover_url = '', category_id: number, is_sticky = 0) {
@@ -17,7 +18,7 @@ class ArticlesService {
   async getList(offset = 0, limit = 10) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time,
+      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
@@ -37,8 +38,8 @@ class ArticlesService {
       GROUP BY atc.id
       LIMIT ?, ?;
     `
-      const [res] = await connection.execute(statement, [offset, limit])
-      return res
+      const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
+      return sortArticles(res)
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
@@ -47,7 +48,7 @@ class ArticlesService {
   async getArticleById(articleId: number) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time,
+      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
@@ -94,8 +95,8 @@ class ArticlesService {
     }
   }
 
-  async updateArticleCover(articleId: number){
-    const coverUrl = `${APP_HOST}:${APP_PORT}/articles/${articleId}/cover`
+  async updateArticleCover(articleId: number) {
+    const coverUrl = `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}/articles/${articleId}/cover`
     try {
       const statement = `
         UPDATE articles

@@ -1,6 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
+      APP_PROTOCOL: string
       APP_HOST: string
       APP_PORT: string
       MYSQL_HOST: string

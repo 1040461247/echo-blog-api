@@ -1,6 +1,7 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
+import sortArticles from '../utils/sort-articles'
 
 class CategoriesService {
   async create(category: string) {
@@ -62,6 +63,7 @@ class CategoriesService {
               atc.cover_url,
               atc.create_time,
               atc.update_time,
+              atc.is_sticky,
               JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
               JSON_OBJECT('id', c.id, 'name', c.name) AS category,
               NULLIF(
@@ -81,10 +83,9 @@ class CategoriesService {
         WHERE c.id = ?
         GROUP BY atc.id, c.id;
       `
-      const [res] = await connection.execute(statement, [categoryId])
-      return res
+      const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
+      return sortArticles(res)
     } catch (error) {
-      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }
