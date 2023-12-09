@@ -39,7 +39,7 @@ class ArticlesService {
       LIMIT ?, ?;
     `
       const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
-      return sortArticles(res)
+      return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
