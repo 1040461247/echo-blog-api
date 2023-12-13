@@ -26,7 +26,15 @@ class TagsService {
 
   async getList() {
     try {
-      const statement = `SELECT * FROM tags;`
+      const statement = `
+        SELECT *,
+          (
+            SELECT COUNT(*)
+            FROM articles_ref_tags art
+            WHERE tags.id = art.tag_id
+          ) article_count
+        FROM tags;
+      `
       const [res] = await connection.execute(statement)
       return res
     } catch (error) {
@@ -46,7 +54,16 @@ class TagsService {
 
   async getTagById(tagId: number) {
     try {
-      const statement = `SELECT * FROM tags WHERE id = ?;`
+      const statement = `
+        SELECT *,
+          (
+            SELECT COUNT(*)
+            FROM articles_ref_tags art
+            WHERE tags.id = art.tag_id
+          ) article_count
+        FROM tags
+        WHERE id = ?;
+      `
       const [res] = await connection.execute(statement, [tagId])
       return res
     } catch (error) {

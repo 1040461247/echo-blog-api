@@ -26,7 +26,15 @@ class CategoriesService {
 
   async getList() {
     try {
-      const statement = `SELECT * FROM categories;`
+      const statement = `
+        SELECT *,
+          (
+            SELECT COUNT(*)
+            FROM articles a
+            WHERE c.id = a.category_id
+          ) article_count
+        FROM categories c;
+      `
       const [res] = await connection.execute(statement)
       return res
     } catch (error) {
@@ -46,7 +54,16 @@ class CategoriesService {
 
   async getCategoryById(categoryId: number) {
     try {
-      const statement = `SELECT * FROM categories WHERE id = ?;`
+      const statement = `
+        SELECT *,
+          (
+            SELECT COUNT(*)
+            FROM articles a
+            WHERE c.id = a.category_id
+          ) article_count
+        FROM categories c
+        WHERE c.id = ?;
+      `
       const [res] = await connection.execute(statement, [categoryId])
       return res
     } catch (error) {
