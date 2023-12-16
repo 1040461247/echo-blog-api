@@ -49,7 +49,13 @@ class ArticlesController {
 
     try {
       const queryRes = (await articlesService.getArticleById(articleId)) as any[]
-      ctx.success(queryRes[0])
+      // 将tags数组序列化为json
+      const articleList = queryRes.map((item) => {
+        const articleList = { ...item }
+        articleList.tags = JSON.parse(item.tags)
+        return articleList
+      })
+      ctx.success(articleList[0])
     } catch (error: any) {
       ctx.fail(error)
     }

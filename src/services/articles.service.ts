@@ -65,7 +65,7 @@ class ArticlesService {
       LEFT JOIN categories c ON c.id = atc.category_id
       LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
       LEFT JOIN tags ON tags.id = art.tag_id
-      WHERE atc.id = 1
+      WHERE atc.id = ?
       GROUP BY atc.id;
       `
       const [res] = await connection.execute(statement, [articleId])
