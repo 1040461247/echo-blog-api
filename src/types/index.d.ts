@@ -1,10 +1,22 @@
-type TResources = 'users' | 'articles' | 'articles_comments' | 'categories' | 'tags' | 'file_avatar' | 'file_illustration' | 'articles_ref_tags'
+type TResources =
+  | 'users'
+  | 'articles'
+  | 'articles_comments'
+  | 'categories'
+  | 'tags'
+  | 'file_avatar'
+  | 'file_illustration'
+  | 'articles_ref_tags'
 
 interface IUsers {
   id?: number
   name: string
   password: string
   avatar_url?: string
+  browser_info?: string
+  os_info?: string
+  ip_address?: string
+  phone_num?: string
   create_time?: string
   update_time?: string
 }
@@ -71,4 +83,14 @@ interface IArticlesRefTags {
   article_id: number
 }
 
-export { TResources, IUsers, IArticles, IArticlesComments, ICategories, ITags, IFileAvatar, IFileIllustration, IArticlesRefTags }
+export {
+  TResources,
+  IUsers,
+  IArticles,
+  IArticlesComments,
+  ICategories,
+  ITags,
+  IFileAvatar,
+  IFileIllustration,
+  IArticlesRefTags
+}

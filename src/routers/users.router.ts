@@ -24,6 +24,9 @@ const { create, list, getAvatarById } = usersController
  *               password:
  *                 type: string
  *                 example: 123456
+ *               phone_num:
+ *                 type: string
+ *                 example: 18669275339
  *     responses:
  *       200:
  *         description: 用户注册成功

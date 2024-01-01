@@ -1,7 +1,4 @@
-import {
-  NAME_OR_PASSWORD_IS_REQUIRED,
-  USER_ALREADY_EXISTS,
-} from '../config/error-types.config'
+import { MISSING_PERAMATERS, NAME_OR_PASSWORD_IS_REQUIRED, USER_ALREADY_EXISTS } from '../config/error-types.config'
 import usersService from '../services/users.service'
 import md5Encryp from '../utils/md5-encryp'
 import type { Middleware } from 'koa'
@@ -31,4 +28,16 @@ const encrypPwd: Middleware = async (ctx, next) => {
   await next()
 }
 
-export { verifyRegisterInfo, encrypPwd }
+const updateUserSystemInfo: Middleware = async (ctx, next) => {
+  try {
+    const { browser_info, os_info, ip_address } = ctx.request.body as IUsers
+    const userId = ctx.user?.id
+    if (browser_info && os_info && ip_address) ctx.fail(new Error(MISSING_PERAMATERS))
+    await usersService.updateUserSystemInfo(userId!, browser_info!, os_info!, ip_address!)
+    next()
+  } catch (error: any) {
+    ctx.fail(error)
+  }
+}
+
+export { verifyRegisterInfo, encrypPwd, updateUserSystemInfo }
