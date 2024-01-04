@@ -3,9 +3,9 @@ import { signToken } from '../utils/authorization'
 
 class AuthController {
   async login(ctx: DefaultContext) {
-    const { id, name, avatar_url } = ctx.user!
-    const token = signToken({ id, name, avatar_url })
-    ctx.success({ id, name, token })
+    const userInfo = ctx.user!
+    const token = signToken(userInfo)
+    ctx.success({ id: userInfo.id, name: userInfo.name, token })
   }
 
   async success(ctx: DefaultContext) {

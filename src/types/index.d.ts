@@ -25,6 +25,7 @@ interface IArticles {
   id?: number
   title: string
   content: string
+  description: string
   album_url?: string
   user_id?: number
   category_id: number

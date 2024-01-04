@@ -9,7 +9,7 @@ import type { IArticles, IFileIllustration } from '../types'
 
 class ArticlesController {
   async create(ctx: DefaultContext) {
-    const { title, content, category_id, cover_url, is_sticky } = ctx.request.body as IArticles
+    const { title, content, category_id, cover_url, is_sticky, description } = ctx.request.body as IArticles
     const { id } = ctx.user!
 
     try {
@@ -19,7 +19,8 @@ class ArticlesController {
         id!,
         cover_url,
         category_id,
-        is_sticky
+        is_sticky,
+        description
       )) as OkPacketParams
       ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
     } catch (error: any) {

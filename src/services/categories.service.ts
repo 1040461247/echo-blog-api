@@ -77,6 +77,7 @@ class CategoriesService {
         SELECT atc.id,
               atc.title,
               atc.content,
+              atc.description,
               atc.cover_url,
               atc.create_time,
               atc.update_time,
