@@ -36,6 +36,7 @@ const verifyAccount: Middleware = async (ctx, next) => {
     return ctx.fail(new Error(PASSWORD_ERROR))
   }
 
+  delete userInfo.password
   ctx.user = userInfo
   await next()
 }

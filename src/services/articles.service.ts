@@ -5,10 +5,26 @@ import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 
 class ArticlesService {
-  async create(title: string, content: string, user_id: number, cover_url = '', category_id: number, is_sticky = 0) {
+  async create(
+    title: string,
+    content: string,
+    user_id: number,
+    cover_url = '',
+    category_id: number,
+    is_sticky = 0,
+    description: string
+  ) {
     try {
-      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky) VALUES (?, ?, ?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [title, content, user_id, cover_url, category_id, is_sticky])
+      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky, description) VALUES (?, ?, ?, ?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [
+        title,
+        content,
+        user_id,
+        cover_url,
+        category_id,
+        is_sticky,
+        description
+      ])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -18,7 +34,7 @@ class ArticlesService {
   async getList(offset = 0, limit = 10) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
+      SELECT atc.id, atc.title, atc.description, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
@@ -48,7 +64,7 @@ class ArticlesService {
   async getArticleById(articleId: number) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
+      SELECT atc.id, atc.title, atc.content, atc.description, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(

@@ -5,7 +5,8 @@ import {
   USER_ALREADY_EXISTS,
   UNAUTHORIZATION,
   DATABASE_ERROR,
-  NO_PERMISSION
+  NO_PERMISSION,
+  MISSING_PERAMATERS
 } from '../config/error-types.config'
 import type { DefaultContext } from 'koa'
 
@@ -41,6 +42,10 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
     case NO_PERMISSION:
       status = 401
       msg = '当前用户没有操作权限'
+      break
+    case MISSING_PERAMATERS:
+      status = 400
+      msg = '缺少必要参数'
       break
   }
 

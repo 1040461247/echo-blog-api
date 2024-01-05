@@ -7,7 +7,7 @@ import type { IUsers } from '../types'
 class UserService {
   async getUserByName(name: string) {
     try {
-      const statement = `SELECT id, name, password, avatar_url, create_time, update_time FROM users WHERE name = ?;`
+      const statement = `SELECT * FROM users WHERE name = ?;`
       const [res] = await connection.execute(statement, [name])
       return res
     } catch (error) {
@@ -26,11 +26,11 @@ class UserService {
   }
 
   async create(userInfo: IUsers) {
-    const { name, password } = userInfo
+    const { name, password, phone_num } = userInfo
 
     try {
-      const statement = `INSERT INTO users (name, password) VALUES (?, ?);`
-      const [res] = await connection.execute(statement, [name, password])
+      const statement = `INSERT INTO users (name, password, phone_num) VALUES (?, ?, ?);`
+      const [res] = await connection.execute(statement, [name, password, phone_num])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -57,6 +57,16 @@ class UserService {
       `
       const [res] = (await connection.execute(statement, [avatar_url, userId])) as RowDataPacket[]
       return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateUserSystemInfo(userId: number, browser_info: string, os_info: string, ip_address: string) {
+    try {
+      const statement = `UPDATE users SET browser_info = ?, os_info = ?, ip_address = ? WHERE id = ?;`
+      const [res] = await connection.execute(statement, [browser_info, os_info, ip_address, userId])
+      return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

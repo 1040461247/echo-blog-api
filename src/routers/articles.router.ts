@@ -3,7 +3,8 @@ import articlesController from '../controllers/articles.controller'
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
-const { create, list, getArticleById, illustration, articleCover, removeCover, updateCategory, createTags } = articlesController
+const { create, list, getArticleById, illustration, articleCover, removeCover, updateCategory, createTags } =
+  articlesController
 
 /**
  * @swagger
@@ -36,6 +37,9 @@ const { create, list, getArticleById, illustration, articleCover, removeCover, u
  *              content:
  *                type: string
  *                example: hello world
+ *              description:
+ *                type: string
+ *                example: article`s descripbe
  *              category_id:
  *                type: number
  *                example: 1

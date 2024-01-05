@@ -1,6 +1,7 @@
 import KoaRouter from '@koa/router'
 import authController from '../controllers/auth.controller'
 import { verifyAccount, verifyAuth } from '../middlewares/auth.middleware'
+import { updateUserSystemInfo } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()
 const { login, success } = authController
@@ -34,11 +35,20 @@ const { login, success } = authController
  *               password:
  *                 type: string
  *                 example: 123456
+ *               browser_info:
+ *                 type: string
+ *                 example: Chrome 10
+ *               os_info:
+ *                 type: string
+ *                 example: Windows 11
+ *               ip_address:
+ *                 type: string
+ *                 example: 云南
  *     responses:
  *      200:
  *        description: 登录成功
  */
-authRouter.post('/login', verifyAccount, login)
+authRouter.post('/login', verifyAccount, updateUserSystemInfo, login)
 /**
  * @swagger
  * /authorized:
