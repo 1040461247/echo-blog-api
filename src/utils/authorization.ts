@@ -5,8 +5,8 @@ import type { IUsers } from '../types'
 
 function signToken(payload: any, expiresIn?: number) {
   const token = jwt.sign(payload, PRIMARY_KEY, {
-    expiresIn: expiresIn ?? 7 * 24 * 60 * 60,
-    algorithm: 'RS256',
+    expiresIn: expiresIn ?? 24 * 60 * 60,
+    algorithm: 'RS256'
   })
 
   return token
@@ -15,7 +15,7 @@ function signToken(payload: any, expiresIn?: number) {
 function verifyToken(token: string) {
   try {
     const user = jwt.verify(token, PUBLIC_KEY, {
-      algorithms: ['RS256'],
+      algorithms: ['RS256']
     }) as IUsers
     return user
   } catch (error) {
