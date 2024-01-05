@@ -1,16 +1,18 @@
+import type { DefaultContext, Middleware } from 'koa'
 import {
+  BAD_PARAMATERS,
+  MISSING_PERAMATERS,
   NAME_OR_PASSWORD_IS_REQUIRED,
   NO_PERMISSION,
   PASSWORD_ERROR,
   UNAUTHORIZATION,
   USER_DOES_NOT_EXISTS
 } from '../config/error-types.config'
-import userService from '../services/users.service'
 import authService from '../services/auth.service'
-import md5Encryp from '../utils/md5-encryp'
-import { verifyToken } from '../utils/authorization'
-import type { DefaultContext, Middleware } from 'koa'
+import userService from '../services/users.service'
 import type { IUsers, TResources } from '../types'
+import { verifyToken } from '../utils/authorization'
+import md5Encryp from '../utils/md5-encryp'
 
 const verifyAccount: Middleware = async (ctx, next) => {
   // 验证用户名密码是否为空
@@ -74,4 +76,14 @@ const verifyPermission = (resourceName: TResources) => {
   }
 }
 
-export { verifyAccount, verifyAuth, verifyPermission }
+const verifyPhone: Middleware = async (ctx, next) => {
+  const { phone } = ctx.request.body as { phone: string }
+  const phoneReg = /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/
+
+  if (!phone) ctx.fail(new Error(MISSING_PERAMATERS))
+  if (!phoneReg.test(phone)) ctx.fail(new Error(BAD_PARAMATERS))
+
+  await next()
+}
+
+export { verifyAccount, verifyAuth, verifyPermission, verifyPhone }

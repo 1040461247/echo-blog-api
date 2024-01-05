@@ -1,14 +1,15 @@
-import {
-  NAME_OR_PASSWORD_IS_REQUIRED,
-  USER_DOES_NOT_EXISTS,
-  PASSWORD_ERROR,
-  USER_ALREADY_EXISTS,
-  UNAUTHORIZATION,
-  DATABASE_ERROR,
-  NO_PERMISSION,
-  MISSING_PERAMATERS
-} from '../config/error-types.config'
 import type { DefaultContext } from 'koa'
+import {
+  BAD_PARAMATERS,
+  DATABASE_ERROR,
+  MISSING_PERAMATERS,
+  NAME_OR_PASSWORD_IS_REQUIRED,
+  NO_PERMISSION,
+  PASSWORD_ERROR,
+  UNAUTHORIZATION,
+  USER_ALREADY_EXISTS,
+  USER_DOES_NOT_EXISTS
+} from '../config/error-types.config'
 
 const errorHandle = (err: Error, ctx: DefaultContext) => {
   let status = 404
@@ -47,6 +48,13 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
       status = 400
       msg = '缺少必要参数'
       break
+    case BAD_PARAMATERS:
+      status = 400
+      msg = '错误参数'
+      break
+    default:
+      status = 400
+      msg = err.message
   }
 
   ctx.type = 'json'

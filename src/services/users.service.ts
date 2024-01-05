@@ -1,7 +1,7 @@
-import connection from '../app/database'
-import { DATABASE_ERROR } from '../config/error-types.config'
-import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import type { RowDataPacket } from 'mysql2'
+import connection from '../app/database'
+import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
+import { DATABASE_ERROR } from '../config/error-types.config'
 import type { IUsers } from '../types'
 
 class UserService {
@@ -9,6 +9,16 @@ class UserService {
     try {
       const statement = `SELECT * FROM users WHERE name = ?;`
       const [res] = await connection.execute(statement, [name])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getUserByPhone(phone: string) {
+    try {
+      const statement = `SELECT * FROM users WHERE phone_num = ?;`
+      const [res] = await connection.execute(statement, [phone])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
