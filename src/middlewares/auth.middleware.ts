@@ -1,6 +1,5 @@
 import type { DefaultContext, Middleware } from 'koa'
 import {
-  BAD_PARAMATERS,
   MISSING_PERAMATERS,
   NAME_OR_PASSWORD_IS_REQUIRED,
   NO_PERMISSION,
@@ -78,10 +77,16 @@ const verifyPermission = (resourceName: TResources) => {
 
 const verifyPhone: Middleware = async (ctx, next) => {
   const { phone } = ctx.request.body as { phone: string }
-  const phoneReg = /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/
+  const phoneReg = /^((0\d{2,3}-\d{7,8})|(1[3584]\d{9}))$/g
 
-  if (!phone) ctx.fail(new Error(MISSING_PERAMATERS))
-  if (!phoneReg.test(phone)) ctx.fail(new Error(BAD_PARAMATERS))
+  if (!phone) {
+    ctx.fail(new Error(MISSING_PERAMATERS))
+    return
+  }
+  if (!phoneReg.test(phone)) {
+    ctx.fail(new Error('手机号格式错误'))
+    return
+  }
 
   await next()
 }

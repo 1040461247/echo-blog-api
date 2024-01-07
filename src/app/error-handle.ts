@@ -58,7 +58,6 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
   }
 
   ctx.type = 'json'
-  ctx.status = Number(status)
   ctx.body = {
     code: Number(status),
     msg: msg
