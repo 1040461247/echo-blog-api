@@ -1,10 +1,10 @@
 import KoaRouter from '@koa/router'
 import authController from '../controllers/auth.controller'
-import { verifyAccount, verifyAuth, verifyPhone } from '../middlewares/auth.middleware'
+import { sendOtp, verifyAccount, verifyAuth, verifyPhone } from '../middlewares/auth.middleware'
 import { updateUserSystemInfo } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()
-const { login, success, sendOpt } = authController
+const { login, success, sended } = authController
 
 /**
  * @swagger
@@ -82,6 +82,6 @@ authRouter.get('/authorized', verifyAuth, success)
  *      200:
  *        description: 发送成功
  */
-authRouter.post('/send-otp', verifyPhone, sendOpt)
+authRouter.post('/send-otp', verifyPhone, sendOtp, sended)
 
 module.exports = authRouter

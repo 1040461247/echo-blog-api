@@ -18,21 +18,24 @@ export default class Client {
     return Math.random().toString().slice(-length)
   }
 
-  static async main(): Promise<void> {
+  static async main(phone: string): Promise<string> {
+    const code = Client.generateOtp(4)
+
     let client = Client.createClient(
       process.env.ALIBABA_CLOUD_ACCESS_KEY_ID!,
       process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET!
     )
     let sendSmsRequest = new $Dysmsapi20170525.SendSmsRequest({
-      phoneNumbers: '18669275339',
+      phoneNumbers: phone,
       signName: 'EchoBlog',
       templateCode: 'SMS_464486007',
-      templateParam: `{"code":${Client.generateOtp(4)}}`
+      templateParam: `{"code":${code}}`
     })
     let runtime = new $Util.RuntimeOptions({})
     try {
       // 复制代码运行请自行打印 API 的返回值
       await client.sendSmsWithOptions(sendSmsRequest, runtime)
+      return code
     } catch (error: any) {
       // 错误 message
       console.log(error.message)

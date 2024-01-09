@@ -12,6 +12,7 @@ import userService from '../services/users.service'
 import type { IUsers, TResources } from '../types'
 import { verifyToken } from '../utils/authorization'
 import md5Encryp from '../utils/md5-encryp'
+import AliyunSMSClient from '../utils/send-sms'
 
 const verifyAccount: Middleware = async (ctx, next) => {
   // 验证用户名密码是否为空
@@ -91,4 +92,15 @@ const verifyPhone: Middleware = async (ctx, next) => {
   await next()
 }
 
-export { verifyAccount, verifyAuth, verifyPermission, verifyPhone }
+const sendOtp: Middleware = async (ctx, next) => {
+  try {
+    const { phone } = ctx.request.body as { phone: string }
+    const otpCode = await AliyunSMSClient.main(phone)
+    ctx.otp = otpCode
+    await next()
+  } catch (error: any) {
+    ctx.fail(error)
+  }
+}
+
+export { sendOtp, verifyAccount, verifyAuth, verifyPermission, verifyPhone }

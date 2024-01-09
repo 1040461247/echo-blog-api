@@ -1,6 +1,8 @@
 import { DefaultContext } from 'koa'
+import redis from '../app/redis'
 import { signToken } from '../utils/authorization'
-import AliyunSMSClient from '../utils/send-sms'
+
+const OTPS_HASH = 'otps'
 
 class AuthController {
   async login(ctx: DefaultContext) {
@@ -13,9 +15,19 @@ class AuthController {
     ctx.success(ctx.user)
   }
 
-  async sendOpt(ctx: DefaultContext) {
+  async sended(ctx: DefaultContext) {
     try {
-      AliyunSMSClient.main()
+      const otpCode = ctx.otp
+      const { phone } = ctx.request.body
+
+      // 存儲驗證碼，并在5分鐘后刪除驗證碼
+      const redisClient = await redis.connect()
+      await redisClient.hSet(OTPS_HASH, phone, otpCode)
+      setTimeout(async () => {
+        await redisClient.hDel(OTPS_HASH, phone)
+        redisClient.disconnect()
+      }, 5 * 60 * 60 * 1000)
+
       ctx.success(undefined, { msg: '发送成功' })
     } catch (error: any) {
       ctx.fail(error)
