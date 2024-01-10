@@ -1,4 +1,5 @@
 import type { DefaultContext, Middleware } from 'koa'
+import getRedisClient from '../app/redis'
 import {
   MISSING_PERAMATERS,
   NAME_OR_PASSWORD_IS_REQUIRED,
@@ -7,6 +8,7 @@ import {
   UNAUTHORIZATION,
   USER_DOES_NOT_EXISTS
 } from '../config/error-types.config'
+import { OTPS_HASH } from '../controllers/auth.controller'
 import authService from '../services/auth.service'
 import userService from '../services/users.service'
 import type { IUsers, TResources } from '../types'
@@ -103,4 +105,17 @@ const sendOtp: Middleware = async (ctx, next) => {
   }
 }
 
-export { sendOtp, verifyAccount, verifyAuth, verifyPermission, verifyPhone }
+const verifyOtp: Middleware = async (ctx, next) => {
+  const { phone, otp } = ctx.request.body as any
+  const redisClient = await getRedisClient()
+  const correctOtp = await redisClient.hGet(OTPS_HASH, phone)
+  redisClient.disconnect()
+
+  if (otp === correctOtp) {
+    await next()
+  } else {
+    ctx.fail(new Error('验证码错误'))
+  }
+}
+
+export { sendOtp, verifyAccount, verifyAuth, verifyOtp, verifyPermission, verifyPhone }

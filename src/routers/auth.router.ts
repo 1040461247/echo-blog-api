@@ -1,10 +1,10 @@
 import KoaRouter from '@koa/router'
 import authController from '../controllers/auth.controller'
-import { sendOtp, verifyAccount, verifyAuth, verifyPhone } from '../middlewares/auth.middleware'
+import { sendOtp, verifyAccount, verifyAuth, verifyOtp, verifyPhone } from '../middlewares/auth.middleware'
 import { updateUserSystemInfo } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()
-const { login, success, sended } = authController
+const { login, success, sended, loginPhone } = authController
 
 /**
  * @swagger
@@ -35,15 +35,6 @@ const { login, success, sended } = authController
  *               password:
  *                 type: string
  *                 example: 123456
- *               browser_info:
- *                 type: string
- *                 example: Chrome 10
- *               os_info:
- *                 type: string
- *                 example: Windows 11
- *               ip_address:
- *                 type: string
- *                 example: 云南
  *     responses:
  *      200:
  *        description: 登录成功
@@ -83,5 +74,29 @@ authRouter.get('/authorized', verifyAuth, success)
  *        description: 发送成功
  */
 authRouter.post('/send-otp', verifyPhone, sendOtp, sended)
+/**
+ * @swagger
+ * /login-phone:
+ *   post:
+ *     tags: [Auth]
+ *     summary: 验证码登陆
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: 18669275339
+ *               otp:
+ *                 type: string
+ *                 exammple: 1234
+ *     responses:
+ *      200:
+ *        description: 发送成功
+ */
+authRouter.post('/login-phone', verifyOtp, loginPhone)
 
 module.exports = authRouter
