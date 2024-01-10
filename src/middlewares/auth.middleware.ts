@@ -1,5 +1,5 @@
 import type { DefaultContext, Middleware } from 'koa'
-import getRedisClient from '../app/redis'
+import getRedisClient, { OTPS_HASH } from '../app/redis'
 import {
   MISSING_PERAMATERS,
   NAME_OR_PASSWORD_IS_REQUIRED,
@@ -8,7 +8,6 @@ import {
   UNAUTHORIZATION,
   USER_DOES_NOT_EXISTS
 } from '../config/error-types.config'
-import { OTPS_HASH } from '../controllers/auth.controller'
 import authService from '../services/auth.service'
 import userService from '../services/users.service'
 import type { IUsers, TResources } from '../types'
