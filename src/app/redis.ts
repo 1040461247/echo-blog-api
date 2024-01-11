@@ -10,4 +10,4 @@ export default async function getRedisClient() {
 
 // Redis Constants
 export const OTPS_HASH = 'otps'
-export const REGISTERING_HASH = 'registering'
+export const REGISTERING_SET = 'registering'

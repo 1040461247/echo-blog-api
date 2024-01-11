@@ -18,7 +18,7 @@ export default class Client {
     return Math.random().toString().slice(-length)
   }
 
-  static async main(phone: string): Promise<string> {
+  static async main(phone: string): Promise<{ status: 0 | 1; msg: number | string }> {
     const code = Client.generateOtp(4)
 
     let client = Client.createClient(
@@ -33,9 +33,15 @@ export default class Client {
     })
     let runtime = new $Util.RuntimeOptions({})
     try {
-      // 复制代码运行请自行打印 API 的返回值
-      await client.sendSmsWithOptions(sendSmsRequest, runtime)
-      return code
+      const { body } = await client.sendSmsWithOptions(sendSmsRequest, runtime)
+      switch (body.code) {
+        case 'OK':
+          return { status: 1, msg: code }
+        case 'isv.BUSINESS_LIMIT_CONTROL':
+          return { status: 0, msg: '今日发送频率已达上限' }
+        default:
+          return { status: 0, msg: '验证码发送失败' }
+      }
     } catch (error: any) {
       // 错误 message
       console.log(error.message)

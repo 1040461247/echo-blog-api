@@ -96,9 +96,13 @@ const verifyPhone: Middleware = async (ctx, next) => {
 const sendOtp: Middleware = async (ctx, next) => {
   try {
     const { phone } = ctx.request.body as { phone: string }
-    const otpCode = await AliyunSMSClient.main(phone)
-    ctx.otp = otpCode
-    await next()
+    const sendRes = await AliyunSMSClient.main(phone)
+    if (sendRes.status === 1) {
+      ctx.otp = sendRes.msg
+      await next()
+    } else {
+      ctx.fail(new Error(sendRes.msg as string))
+    }
   } catch (error: any) {
     ctx.fail(error)
   }
@@ -108,7 +112,7 @@ const verifyOtp: Middleware = async (ctx, next) => {
   const { phone, otp } = ctx.request.body as any
   const redisClient = await getRedisClient()
   const correctOtp = await redisClient.hGet(OTPS_HASH, phone)
-  redisClient.disconnect()
+  redisClient.quit()
 
   if (otp === correctOtp) {
     await next()
