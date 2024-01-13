@@ -1,16 +1,22 @@
 import { DefaultContext } from 'koa'
 import { UAParser } from 'ua-parser-js'
 
-export default function getUserSystemInfo(ctx: DefaultContext) {
-  // Get BrowserInfo And OSInfo
+export interface IUserSystemInfo {
+  browser_info: string
+  os_info: string
+  ip_address: string
+}
+
+export default function getUserSystemInfo(ctx: DefaultContext): IUserSystemInfo {
+  // Get browser_info And os_info
   const uaStr = ctx.headers['user-agent']
   const parser = new UAParser(uaStr)
   const browser = parser.getBrowser()
   const os = parser.getOS()
-  const browserInfo = `${browser.name} ${browser.major}`
-  const osInfo = `${os.name} ${os.version}`
+  const browser_info = `${browser.name} ${browser.major}`
+  const os_info = `${os.name} ${os.version}`
 
-  // Get IpAddress
-  const ipAddress = ctx.request.ip
-  return { browserInfo, osInfo, ipAddress }
+  // Get ip_address
+  const ip_address = ctx.request.ip
+  return { browser_info, os_info, ip_address }
 }

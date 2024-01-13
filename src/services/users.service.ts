@@ -3,6 +3,7 @@ import connection from '../app/database'
 import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { IUsers } from '../types'
+import { IUserSystemInfo } from '../utils/get-user-system-info'
 
 class UserService {
   async getUserByName(name: string) {
@@ -35,12 +36,13 @@ class UserService {
     }
   }
 
-  async create(userInfo: IUsers) {
+  async create(userInfo: IUsers, systemInfo: IUserSystemInfo) {
     const { name, password, phone_num } = userInfo
+    const { browser_info, os_info, ip_address } = systemInfo
 
     try {
-      const statement = `INSERT INTO users (name, password, phone_num) VALUES (?, ?, ?);`
-      const [res] = await connection.execute(statement, [name, password, phone_num])
+      const statement = `INSERT INTO users (name, password, phone_num, browser_info, os_info, ip_address) VALUES (?, ?, ?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [name, password, phone_num, browser_info, os_info, ip_address])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)

@@ -40,6 +40,7 @@ export default class Client {
         case 'isv.BUSINESS_LIMIT_CONTROL':
           return { status: 0, msg: '今日发送频率已达上限' }
         default:
+          console.log(body, `code:${code}`)
           return { status: 0, msg: '验证码发送失败' }
       }
     } catch (error: any) {

@@ -47,8 +47,8 @@ class AuthController {
         }
 
         // 更新用户的system信息
-        const { browserInfo, osInfo, ipAddress } = getUserSystemInfo(ctx)
-        usersService.updateUserSystemInfo(userInfo.id, browserInfo, osInfo, ipAddress)
+        const { browser_info, os_info, ip_address } = getUserSystemInfo(ctx)
+        usersService.updateUserSystemInfo(userInfo.id, browser_info, os_info, ip_address)
         const token = signToken({ id: userInfo.id, name: userInfo.name })
         ctx.success({ status: 1, msg: '登陆成功', user: { id: userInfo.id, name: userInfo.name, token: token } })
       } else {

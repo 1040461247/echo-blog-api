@@ -2,16 +2,23 @@ import fs from 'fs'
 import userService from '../services/users.service'
 import { AVATAR_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
-import type { OkPacketParams } from 'mysql2'
+import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { IFileAvatar, IUsers } from '../types'
+import getUserSystemInfo from '../utils/get-user-system-info'
+import { signToken } from '../utils/authorization'
 
-const { create, getUserList, getAvatarById } = userService
+const { create, getUserList, getAvatarById, getUserByName } = userService
 
 class UsersController {
   async create(ctx: DefaultContext) {
     try {
-      const insertRes = (await create(ctx.request.body)) as OkPacketParams
-      ctx.success(insertRes, { msg: '注册成功' })
+      const userSystemInfo = getUserSystemInfo(ctx)
+      const insertRes = (await create(ctx.request.body, userSystemInfo)) as OkPacketParams
+      const [{ id, name }] = (await getUserByName(ctx.request.body.name)) as IUsers[]
+
+      // 注册成功后，登录用户
+      const token = signToken({ id, name })
+      ctx.success({ id, name, token })
     } catch (error: any) {
       ctx.fail(error)
     }
