@@ -15,6 +15,7 @@ declare global {
       REDIS_PASSWORD: string
       ALIBABA_CLOUD_ACCESS_KEY_ID: string
       ALIBABA_CLOUD_ACCESS_KEY_SECRET: string
+      BAIDU_AK: string
     }
   }
 }

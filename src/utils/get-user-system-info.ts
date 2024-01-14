@@ -17,6 +17,6 @@ export default function getUserSystemInfo(ctx: DefaultContext): IUserSystemInfo 
   const os_info = `${os.name} ${os.version}`
 
   // Get ip_address
-  const ip_address = ctx.request.ip
+  const ip_address = ctx.headers['x-forwarded-for'] || ctx.headers['x-real-ip'] || ctx.ip
   return { browser_info, os_info, ip_address }
 }
