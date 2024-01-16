@@ -46,7 +46,7 @@ class ArticlesCommentsService {
     try {
       const statement = `
         SELECT ac.id id, ac.content content, ac.comment_id comment_id, ac.create_time create_time, ac.update_time update_time,
-          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) user
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url, 'browser_info', u.browser_info, 'os_info', u.os_info, 'ip_address', u.ip_address) user
         FROM articles_comments ac
         LEFT JOIN users u ON ac.user_id = u.id
         WHERE ac.article_id = ?;
