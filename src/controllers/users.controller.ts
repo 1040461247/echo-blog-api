@@ -7,7 +7,7 @@ import type { IFileAvatar, IUsers } from '../types'
 import getUserSystemInfo from '../utils/get-user-system-info'
 import { signToken } from '../utils/authorization'
 
-const { create, getUserList, getAvatarById, getUserByName } = userService
+const { create, getUserList, getAvatarById, getUserByName, getUserById } = userService
 
 class UsersController {
   async create(ctx: DefaultContext) {
@@ -17,7 +17,7 @@ class UsersController {
       const [{ id, name }] = (await getUserByName(ctx.request.body.name)) as IUsers[]
 
       // 注册成功后，登录用户
-      const token = signToken({ id, name })
+      const token = signToken({ id: id! })
       ctx.success({ id, name, token })
     } catch (error: any) {
       ctx.fail(error)
@@ -45,6 +45,18 @@ class UsersController {
       }
     } catch (error: any) {
       ctx.fail(error)
+    }
+  }
+
+  async getUserById(ctx: DefaultContext) {
+    const { userId } = ctx.params
+
+    try {
+      const [userInfo] = (await getUserById(userId)) as RowDataPacket[]
+      delete userInfo.password
+      ctx.success(userInfo)
+    } catch (error: any) {
+      ctx.fail
     }
   }
 }

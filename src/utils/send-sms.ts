@@ -15,11 +15,13 @@ export default class Client {
   }
 
   static generateOtp(length: number) {
-    return Math.random().toString().slice(-length)
+    let code = Number(Math.random().toString().slice(-length))
+    if (code < 1000) code += 1000
+    return code
   }
 
   static async main(phone: string): Promise<{ status: 0 | 1; msg: number | string }> {
-    const code = Client.generateOtp(4)
+    let code = Client.generateOtp(4)
 
     let client = Client.createClient(
       process.env.ALIBABA_CLOUD_ACCESS_KEY_ID!,

@@ -8,12 +8,12 @@ export interface ISuccessOption {
 }
 
 const responseHandle: Middleware = async function (ctx, next) {
-  ctx.success = function (data?: any, option?: ISuccessOption) {
+  ctx.success = function (data = null, option?: ISuccessOption) {
     ctx.type = option?.type ?? 'json'
     ctx.body = {
       code: option?.code ?? 200,
       msg: option?.msg ?? 'success',
-      data: data,
+      data: data
     }
   }
 

@@ -3,7 +3,8 @@ import articlesCommentsController from '../controllers/articles-comments.control
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
-const { create, reply, update, remove, getCommentsById } = articlesCommentsController
+const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getLikesCountById } =
+  articlesCommentsController
 
 /**
  * @swagger
@@ -140,5 +141,67 @@ ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('artic
  *        description: 获取成功
  */
 ArticlesCommentsRouter.get('/', getCommentsById)
+/**
+ * @swagger
+ * /articles-comments/likes:
+ *  post:
+ *    tags: [Articles Comments]
+ *    summary: 点赞评论
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              comment_id:
+ *                type: number
+ *                example: 1
+ *    responses:
+ *      200:
+ *        description: 点赞成功
+ */
+ArticlesCommentsRouter.post('/likes', verifyAuth, addLikes)
+/**
+ * @swagger
+ * /articles-comments/likes/{commentId}:
+ *  delete:
+ *    tags: [Articles Comments]
+ *    summary: 取消点赞
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: commentId
+ *        required: true
+ *    responses:
+ *      200:
+ *        description: 删除成功
+ */
+ArticlesCommentsRouter.delete(
+  '/likes/:commentId',
+  verifyAuth,
+  verifyPermission('comment_likes', 'comment_id'),
+  remLikes
+)
+/**
+ * @swagger
+ * /articles-comments/likes/{commentId}:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据评论id获取点赞数
+ *    parameters:
+ *      - in: path
+ *        name: commentId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/likes/:commentId', getLikesCountById)
 
 module.exports = ArticlesCommentsRouter

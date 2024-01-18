@@ -7,11 +7,12 @@ type TResources =
   | 'file_avatar'
   | 'file_illustration'
   | 'articles_ref_tags'
+  | 'comment_likes'
 
 interface IUsers {
   id?: number
   name: string
-  password: string
+  password?: string
   avatar_url?: string
   browser_info?: string
   os_info?: string

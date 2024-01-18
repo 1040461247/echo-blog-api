@@ -3,7 +3,7 @@ import usersController from '../controllers/users.controller'
 import { verifyRegisterInfo, encrypPwd } from '../middlewares/users.middleware'
 
 const usersRouter = new KoaRouter({ prefix: '/users' })
-const { create, list, getAvatarById } = usersController
+const { create, list, getAvatarById, getUserById } = usersController
 
 /**
  * @swagger
@@ -61,5 +61,23 @@ usersRouter.get('/', list)
  *        description: 返回用户头像
  */
 usersRouter.get('/:userId/avatar', getAvatarById)
+/**
+ * @swagger
+ * /users/{userId}:
+ *  get:
+ *    tags: [Users]
+ *    summary: 获取用户信息
+ *    parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+usersRouter.get('/:userId', getUserById)
 
 module.exports = usersRouter

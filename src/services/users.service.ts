@@ -8,7 +8,10 @@ import { IUserSystemInfo } from '../utils/get-user-system-info'
 class UserService {
   async getUserByName(name: string) {
     try {
-      const statement = `SELECT * FROM users WHERE name = ?;`
+      const statement = `
+        SELECT *
+        FROM users
+        WHERE name = ?;`
       const [res] = await connection.execute(statement, [name])
       return res
     } catch (error) {
@@ -18,8 +21,30 @@ class UserService {
 
   async getUserByPhone(phone: string) {
     try {
-      const statement = `SELECT * FROM users WHERE phone_num = ?;`
+      const statement = `
+        SELECT *
+        FROM users
+        WHERE phone_num = ?;
+      `
       const [res] = await connection.execute(statement, [phone])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getUserById(userId: number) {
+    try {
+      const statement = `
+        SELECT users.*,
+          (SELECT JSON_ARRAYAGG(comment_likes.comment_id)
+          FROM comment_likes
+          WHERE comment_likes.user_id = users.id
+          GROUP BY comment_likes.user_id) AS commentLikesId
+        FROM users
+        WHERE id = ?;
+      `
+      const [res] = await connection.execute(statement, [userId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)

@@ -3,7 +3,12 @@ import { PRIMARY_KEY, PUBLIC_KEY } from '../config/env.config'
 import { UNAUTHORIZATION } from '../config/error-types.config'
 import type { IUsers } from '../types'
 
-function signToken(payload: any, expiresIn?: number) {
+// Types
+export interface ISalt {
+  id: number
+}
+
+function signToken(payload: ISalt, expiresIn?: number) {
   const token = jwt.sign(payload, PRIMARY_KEY, {
     expiresIn: expiresIn ?? 24 * 60 * 60,
     algorithm: 'RS256'

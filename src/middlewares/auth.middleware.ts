@@ -39,8 +39,7 @@ const verifyAccount: Middleware = async (ctx, next) => {
     return ctx.fail(new Error(PASSWORD_ERROR))
   }
 
-  delete userInfo.password
-  ctx.user = userInfo
+  ctx.user = { id: userInfo.id, name: userInfo.name }
   await next()
 }
 
@@ -57,7 +56,7 @@ const verifyAuth: Middleware = async (ctx, next) => {
   }
 }
 
-const verifyPermission = (resourceName: TResources) => {
+const verifyPermission = (resourceName: TResources, filed?: string) => {
   // 检查用户是否有某资源的操作权限
   return async (ctx: DefaultContext, next: () => Promise<any>) => {
     const paramsKeys = Object.keys(ctx.params)
@@ -65,7 +64,15 @@ const verifyPermission = (resourceName: TResources) => {
     const userId = ctx.user!.id!
 
     try {
-      const hasPermision = await authService.hasPermission(resourceName, resourceFiledId, userId)
+      let hasPermision: boolean
+      if (filed) {
+        // 联合主键，表中没有id字段时
+        hasPermision = await authService.hasPermissionRef(resourceName, resourceFiledId, userId, filed)
+      } else {
+        // 非联合主键，表中有id字段时
+        hasPermision = await authService.hasPermission(resourceName, resourceFiledId, userId)
+      }
+
       if (hasPermision) {
         await next()
       } else {

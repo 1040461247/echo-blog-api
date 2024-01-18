@@ -16,6 +16,20 @@ class AuthService {
     }
   }
 
+  async hasPermissionRef(resourceName: string, resourceFiledId: number, userId: number, filed: string) {
+    try {
+      const statement = `SELECT ${filed} FROM ${resourceName} WHERE ${filed} = ? AND user_id = ?;`
+      const [res] = await connection.execute(statement, [resourceFiledId, userId])
+      if (Array.isArray(res) && res.length > 0) {
+        return true
+      } else {
+        return false
+      }
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
   async hasUserByPhone(phone: string) {
     try {
       const statement = `SELECT id FROM users WHERE phone_num = ?;`
