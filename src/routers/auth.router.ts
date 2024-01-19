@@ -52,7 +52,7 @@ authRouter.post('/login', verifyAccount, updateUserSystemInfo, login)
  *      200:
  *        description: 鉴权通过
  */
-authRouter.get('/authorized', verifyAuth, success)
+authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, success)
 /**
  * @swagger
  * /send-otp:
