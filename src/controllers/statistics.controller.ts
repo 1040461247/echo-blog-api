@@ -1,4 +1,4 @@
-import type { DefaultContext } from "koa";
+import type { DefaultContext } from 'koa'
 import statisticsService from '../services/statistics.service'
 
 // Types
@@ -11,7 +11,7 @@ interface ITotal {
 class StatisticsController {
   async total(ctx: DefaultContext) {
     const resourceList = ['articles', 'tags', 'categories']
-    const res = await statisticsService.getTotal(resourceList) as ITotal
+    const res = (await statisticsService.getTotal(resourceList)) as ITotal
     ctx.success(res)
   }
 }

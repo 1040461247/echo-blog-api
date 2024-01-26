@@ -1,6 +1,5 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
-import type { OkPacketParams } from 'mysql2'
 
 class StatisticsService {
   async getTotal(resourceList: string[]) {
