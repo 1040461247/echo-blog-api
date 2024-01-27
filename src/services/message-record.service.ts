@@ -1,52 +1,37 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
+import { TMsgState } from '../controllers/message-record.controller'
+
+// Types
+export type TMessageType = '0' | '1' | '2' | '3' | '4'
 
 class MessageRecordService {
-  async getListByUserId(userId: number) {
+  async getList(userId: number) {
     try {
       const statement = `
-        SELECT JSON_OBJECT(
-          'unRead', (SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                'id', mr.id,
-                'content', mr.content,
-                'link', mr.link,
-                'createTime', mr.create_time,
-                'sendUser', JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url)
-              )) FROM message_record WHERE message_record.state = '0' GROUP BY send_user),
-            'read', (SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                'id', mr.id,
-                'content', mr.content,
-                'link', mr.link,
-                'createTime', mr.create_time,
-                'sendUser', JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url)
-              )) FROM message_record WHERE message_record.state = '1' GROUP BY send_user),
-            'like', (SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                'id', mr.id,
-                'content', mr.content,
-                'link', mr.link,
-                'createTime', mr.create_time,
-                'sendUser', JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url)
-              )) FROM message_record WHERE message_record.message_type = '0' GROUP BY send_user),
-            'comment', (SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                'id', mr.id,
-                'content', mr.content,
-                'link', mr.link,
-                'createTime', mr.create_time,
-                'sendUser', JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url)
-              )) FROM message_record WHERE message_record.message_type = '1' GROUP BY send_user),
-            'notice', (SELECT JSON_ARRAYAGG(JSON_OBJECT(
-                'id', mr.id,
-                'content', mr.content,
-                'link', mr.link,
-                'createTime', mr.create_time,
-                'sendUser', JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url)
-              )) FROM message_record WHERE message_record.message_type = '2' GROUP BY send_user)
-          ) userMessage
+        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time creteTime,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) sendUser
         FROM message_record mr
         LEFT JOIN users u ON u.id = mr.send_user
-        WHERE target_user = 5;
+        WHERE target_user = ?
       `
       const [res] = await connection.execute(statement, [userId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getListByState(userId: number, state: TMsgState) {
+    try {
+      const statement = `
+        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time creteTime,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) sendUser
+        FROM message_record mr
+        LEFT JOIN users u ON u.id = mr.send_user
+        WHERE target_user = ? AND state = ?
+      `
+      const [res] = await connection.execute(statement, [userId, state])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -69,6 +54,23 @@ class MessageRecordService {
       const [res] = await connection.execute(statement, [userId])
       return res
     } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createMessage(
+    messageType: TMessageType,
+    sendUser: number,
+    targetUser: number,
+    content: string,
+    linkAtcId: number
+  ) {
+    try {
+      const statement = `INSERT INTO message_record (message_type, send_user, target_user, content, link_atc_id) VALUES (?, ?, ?, ?, ?)`
+      const [res] = await connection.execute(statement, [messageType, sendUser, targetUser, content, linkAtcId])
+      return res
+    } catch (error) {
+      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }

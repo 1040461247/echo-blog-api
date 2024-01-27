@@ -59,6 +59,22 @@ class ArticlesCommentsService {
     }
   }
 
+  async getCommentById(commentId: number) {
+    try {
+      const statement = `
+        SELECT ac.id id, ac.content content, ac.article_id article_id, ac.comment_id comment_id, ac.create_time create_time, ac.update_time update_time,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url, 'browser_info', u.browser_info, 'os_info', u.os_info, 'ip_address', u.ip_address) user
+        FROM articles_comments ac
+        LEFT JOIN users u ON ac.user_id = u.id
+        WHERE ac.id = ?;
+      `
+      const [res] = await connection.execute(statement, [commentId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
   async addLikes(user_id: number, comment_id: number) {
     try {
       const statement = `INSERT INTO comment_likes (user_id, comment_id) VALUES (?, ?);`

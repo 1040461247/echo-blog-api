@@ -28,6 +28,11 @@ const { list, clearUnread, unreadCount } = messageRecordController
  *        schema:
  *          type: number
  *          example: 1
+ *      - in: query
+ *        name: state
+ *        schema:
+ *          type: string
+ *          example: 0
  *    responses:
  *      200:
  *        description: success

@@ -3,17 +3,28 @@ import messageRecordService from '../services/message-record.service'
 import { OkPacketParams, RowDataPacket } from 'mysql2'
 
 // Types
-interface IUnreadListParams {
+interface IListParams {
   userId: number
 }
-interface IUnreadCountParams extends IUnreadListParams {}
+export type TMsgState = '0' | '1'
+interface IListQuery {
+  state: TMsgState
+}
+interface IUnreadCountParams extends IListParams {}
 
 class MessageRecordController {
   async list(ctx: DefaultContext) {
     try {
-      const { userId } = ctx.params as IUnreadListParams
-      const [{ userMessage }] = (await messageRecordService.getListByUserId(userId)) as RowDataPacket[]
-      ctx.success(userMessage)
+      const { userId } = ctx.params as IListParams
+      const { state } = ctx.query as IListQuery
+
+      let resList
+      if (state) {
+        resList = await messageRecordService.getListByState(userId, state)
+      } else {
+        resList = await messageRecordService.getList(userId)
+      }
+      ctx.success(resList)
     } catch (error: any) {
       ctx.fail(error)
     }

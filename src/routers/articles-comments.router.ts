@@ -1,6 +1,11 @@
 import KoaRouter from '@koa/router'
 import articlesCommentsController from '../controllers/articles-comments.controller'
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
+import {
+  recordMessageOfComment,
+  recordMessageOfLikeComment,
+  recordMessageOfReply
+} from '../middlewares/message-record.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
 const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getLikesCountById } =
@@ -44,7 +49,7 @@ const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getL
  *      200:
  *        description: 评论成功
  */
-ArticlesCommentsRouter.post('/', verifyAuth, create)
+ArticlesCommentsRouter.post('/', verifyAuth, recordMessageOfComment, create)
 /**
  * @swagger
  * /articles-comments/{commentId}/reply:
@@ -78,7 +83,7 @@ ArticlesCommentsRouter.post('/', verifyAuth, create)
  *      200:
  *        description: 回复成功
  */
-ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, reply)
+ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, recordMessageOfReply, reply)
 /**
  * @swagger
  * /articles-comments/{commentId}:
@@ -163,7 +168,7 @@ ArticlesCommentsRouter.get('/', getCommentsById)
  *      200:
  *        description: 点赞成功
  */
-ArticlesCommentsRouter.post('/likes', verifyAuth, addLikes)
+ArticlesCommentsRouter.post('/likes', verifyAuth, recordMessageOfLikeComment, addLikes)
 /**
  * @swagger
  * /articles-comments/likes/{commentId}:
