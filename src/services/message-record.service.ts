@@ -6,32 +6,36 @@ import { TMsgState } from '../controllers/message-record.controller'
 export type TMessageType = '0' | '1' | '2' | '3' | '4'
 
 class MessageRecordService {
-  async getList(userId: number) {
+  async getList(userId: number, offset = 0, limit = 10) {
     try {
       const statement = `
-        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time creteTime,
+        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time createTime,
           JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) sendUser
         FROM message_record mr
         LEFT JOIN users u ON u.id = mr.send_user
         WHERE target_user = ?
+        ORDER BY mr.create_time DESC
+        LIMIT ?, ?
       `
-      const [res] = await connection.execute(statement, [userId])
+      const [res] = await connection.execute(statement, [userId, offset, limit])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
   }
 
-  async getListByState(userId: number, state: TMsgState) {
+  async getListByState(userId: number, state: TMsgState, offset = 0, limit = 10) {
     try {
       const statement = `
-        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time creteTime,
+        SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time createTime,
           JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) sendUser
         FROM message_record mr
         LEFT JOIN users u ON u.id = mr.send_user
         WHERE target_user = ? AND state = ?
+        ORDER BY mr.create_time DESC
+        LIMIT ?, ?
       `
-      const [res] = await connection.execute(statement, [userId, state])
+      const [res] = await connection.execute(statement, [userId, state, offset, limit])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -51,6 +55,16 @@ class MessageRecordService {
   async getUnreadCountByUserId(userId: number) {
     try {
       const statement = `SELECT COUNT(*) unreadCount FROM message_record WHERE target_user = ? AND state = '0';`
+      const [res] = await connection.execute(statement, [userId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getAllCountByUserId(userId: number) {
+    try {
+      const statement = `SELECT COUNT(*) allCount FROM message_record WHERE target_user = ?;`
       const [res] = await connection.execute(statement, [userId])
       return res
     } catch (error) {

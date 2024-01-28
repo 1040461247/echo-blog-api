@@ -9,6 +9,8 @@ interface IListParams {
 export type TMsgState = '0' | '1'
 interface IListQuery {
   state: TMsgState
+  offset?: number
+  limit?: number
 }
 interface IUnreadCountParams extends IListParams {}
 
@@ -16,13 +18,13 @@ class MessageRecordController {
   async list(ctx: DefaultContext) {
     try {
       const { userId } = ctx.params as IListParams
-      const { state } = ctx.query as IListQuery
+      const { state, offset, limit } = ctx.query as IListQuery
 
       let resList
       if (state) {
-        resList = await messageRecordService.getListByState(userId, state)
+        resList = await messageRecordService.getListByState(userId, state, offset, limit)
       } else {
-        resList = await messageRecordService.getList(userId)
+        resList = await messageRecordService.getList(userId, offset, limit)
       }
       ctx.success(resList)
     } catch (error: any) {
@@ -40,11 +42,12 @@ class MessageRecordController {
     }
   }
 
-  async unreadCount(ctx: DefaultContext) {
+  async total(ctx: DefaultContext) {
     try {
       const { userId } = ctx.params as IUnreadCountParams
-      const [res] = (await messageRecordService.getUnreadCountByUserId(userId!)) as RowDataPacket[]
-      ctx.success(res)
+      const [unreadCount] = (await messageRecordService.getUnreadCountByUserId(userId!)) as RowDataPacket[]
+      const [allCount] = (await messageRecordService.getAllCountByUserId(userId!)) as RowDataPacket[]
+      ctx.success({ ...unreadCount, ...allCount })
     } catch (error: any) {
       ctx.fail(error)
     }

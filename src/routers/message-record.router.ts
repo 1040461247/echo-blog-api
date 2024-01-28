@@ -3,7 +3,7 @@ import messageRecordController from '../controllers/message-record.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const messageRecordRouter = new KoaRouter({ prefix: '/message-record' })
-const { list, clearUnread, unreadCount } = messageRecordController
+const { list, clearUnread, total } = messageRecordController
 
 /**
  * @swagger
@@ -33,6 +33,16 @@ const { list, clearUnread, unreadCount } = messageRecordController
  *        schema:
  *          type: string
  *          example: 0
+ *      - in: query
+ *        name: offset
+ *        schema:
+ *          type: number
+ *          example: 0
+ *      - in: query
+ *        name: limit
+ *        schema:
+ *          type: number
+ *          example: 10
  *    responses:
  *      200:
  *        description: success
@@ -40,10 +50,10 @@ const { list, clearUnread, unreadCount } = messageRecordController
 messageRecordRouter.get('/:userId', list)
 /**
  * @swagger
- * /message-record/{userId}/unread/:
+ * /message-record/{userId}/total/:
  *  get:
  *    tags: [MessageRecord]
- *    summary: 根据id获取用户未读消息数量
+ *    summary: 根据id获取用户消息数量
  *    parameters:
  *      - in: path
  *        name: userId
@@ -55,7 +65,7 @@ messageRecordRouter.get('/:userId', list)
  *      200:
  *        description: success
  */
-messageRecordRouter.get('/:userId/unread', unreadCount)
+messageRecordRouter.get('/:userId/total', total)
 /**
  * @swagger
  * /message-record:
