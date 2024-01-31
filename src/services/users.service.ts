@@ -85,7 +85,7 @@ class UserService {
   }
 
   async updateAvatar(userId: number) {
-    const avatar_url = `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}/users/${userId}/avatar`
+    const avatar_url = `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}/users/${userId}/avatar?ref=${Date.now()}`
     try {
       const statement = `
         UPDATE users
@@ -105,6 +105,24 @@ class UserService {
       const [res] = await connection.execute(statement, [browser_info, os_info, ip_address, userId])
       return res
     } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateUserById(userId: number, name?: string | undefined, password?: string | undefined) {
+    const setStateArr: string[] = []
+    name && setStateArr.push('name = ?')
+    password && setStateArr.push('password = ?')
+
+    const setState = setStateArr.join(', ')
+    const values = [...[name], ...[password], userId].filter((item) => item)
+
+    try {
+      const statement = `UPDATE users SET ${setState} WHERE id = ?;`
+      const [res] = await connection.execute(statement, values)
+      return res
+    } catch (error) {
+      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }

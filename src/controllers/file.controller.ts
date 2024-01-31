@@ -14,11 +14,12 @@ class FileController {
     const { id } = ctx.user!
 
     try {
-      const uesrAvatar = await userService.getAvatarById(id!) as IFileAvatar
+      const uesrAvatar = (await userService.getAvatarById(id!)) as IFileAvatar
       if (uesrAvatar) {
         // 头像已存在，删除源文件并更新
         await fs.unlink(`${AVATAR_PATH}/${uesrAvatar.filename}`)
         await fileService.updateAvatar(filename, mimetype, size, id!)
+        await usersService.updateAvatar(id!)
         ctx.success()
       } else {
         // 新增头像
@@ -51,7 +52,7 @@ class FileController {
     const { articleId } = ctx.params
 
     try {
-      const articleCover = await articlesService.getArticleCoverById(articleId) as IFileIllustration
+      const articleCover = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
       if (articleCover) {
         // 封面已存在，删除源文件并更新
         await fs.unlink(`${ILLUSTRATION_PATH}/${articleCover.filename}`)

@@ -1,8 +1,0 @@
-[2023-11-24T13:32:52.553] [INFO] http - ::1 - - "GET /swagger HTTP/1.1" 200 6403 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:32:54.343] [INFO] http - ::1 - - "GET /favicon.png HTTP/1.1" 200 - "http://localhost:8000/swagger" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:34:30.603] [INFO] http - ::1 - - "GET /swagger HTTP/1.1" 200 6926 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:34:30.919] [INFO] http - ::1 - - "GET /favicon.png HTTP/1.1" 200 - "http://localhost:8000/swagger" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:35:23.656] [INFO] http - ::1 - - "GET /swagger HTTP/1.1" 200 6866 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:35:23.920] [INFO] http - ::1 - - "GET /favicon.png HTTP/1.1" 200 - "http://localhost:8000/swagger" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:35:37.328] [INFO] http - ::1 - - "POST /login HTTP/1.1" 200 548 "http://localhost:8000/swagger" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-[2023-11-24T13:36:01.762] [INFO] http - ::1 - - "POST /articles-comments/1/reply HTTP/1.1" 200 50 "http://localhost:8000/swagger" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"

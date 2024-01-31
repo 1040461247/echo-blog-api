@@ -52,6 +52,8 @@ const verifyAuth: Middleware = async (ctx, next) => {
     ctx.user! = user
     await next()
   } catch (error: any) {
+    console.log(error)
+
     ctx.fail(error)
   }
 }
