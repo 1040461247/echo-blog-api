@@ -18,10 +18,14 @@ export default function getUserSystemInfo(ctx: DefaultContext): IUserSystemInfo 
   const os_info = `${os.name} ${os.version}`
 
   // Get ip_address
-  const ip = ctx.headers['x-forwarded-for'] || ctx.headers['x-real-ip'] || ctx.ip
+  const ip = getReqIp(ctx)
   const query = new IP2Region()
   const ipRes = query.search(ip)!
   const ip_address = ipRes?.province! || ipRes?.isp
 
   return { browser_info, os_info, ip_address }
+}
+
+export function getReqIp(ctx: DefaultContext) {
+  return ctx.headers['x-forwarded-for'] || ctx.headers['x-real-ip'] || ctx.ip
 }
