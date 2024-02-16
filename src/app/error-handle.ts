@@ -7,6 +7,7 @@ import {
   NO_PERMISSION,
   PASSWORD_ERROR,
   UNAUTHORIZATION,
+  AUTHORIZATION_EXPIRES,
   USER_ALREADY_EXISTS,
   USER_DOES_NOT_EXISTS
 } from '../config/error-types.config'
@@ -35,6 +36,10 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
     case UNAUTHORIZATION:
       status = 401
       msg = '未授权，请先登录'
+      break
+    case AUTHORIZATION_EXPIRES:
+      status = 401
+      msg = '授权已过期，请重新登录'
       break
     case DATABASE_ERROR:
       status = 500

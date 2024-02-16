@@ -5,7 +5,7 @@ import type { DefaultContext } from 'koa'
 import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { IFileAvatar, IUsers } from '../types'
 import getUserSystemInfo from '../utils/get-user-system-info'
-import { signToken } from '../utils/authorization'
+import { remTokenFromWhiteList, signToken } from '../utils/authorization'
 
 // Types
 interface IUpdateBody {
@@ -70,6 +70,16 @@ class UsersController {
     try {
       await userService.updateUserById(userId!, name, password)
       ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async logout(ctx: DefaultContext) {
+    const userId = ctx.user?.id
+    try {
+      userId && (await remTokenFromWhiteList(String(userId)))
+      ctx.success(null, { msg: '用户已登出' })
     } catch (error: any) {
       ctx.fail(error)
     }

@@ -48,12 +48,11 @@ const verifyAuth: Middleware = async (ctx, next) => {
   if (!token) ctx.fail(new Error(UNAUTHORIZATION))
 
   try {
-    const user = verifyToken(token!)
+    const user = await verifyToken(token!)
     ctx.user! = user
     await next()
   } catch (error: any) {
     console.log(error)
-
     ctx.fail(error)
   }
 }

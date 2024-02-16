@@ -21,37 +21,39 @@ export default class Client {
   }
 
   static async main(phone: string): Promise<{ status: 0 | 1; msg: number | string }> {
-    let code = Client.generateOtp(4)
+    return { status: 1, msg: 1234 }
 
-    let client = Client.createClient(
-      process.env.ALIBABA_CLOUD_ACCESS_KEY_ID!,
-      process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET!
-    )
-    let sendSmsRequest = new $Dysmsapi20170525.SendSmsRequest({
-      phoneNumbers: phone,
-      signName: 'EchoBlog',
-      templateCode: 'SMS_464486007',
-      templateParam: `{"code":${code}}`
-    })
-    let runtime = new $Util.RuntimeOptions({})
-    try {
-      const { body } = await client.sendSmsWithOptions(sendSmsRequest, runtime)
-      switch (body.code) {
-        case 'OK':
-          return { status: 1, msg: code }
-        case 'isv.BUSINESS_LIMIT_CONTROL':
-          return { status: 0, msg: '今日发送频率已达上限' }
-        default:
-          console.log(body, `code:${code}`)
-          return { status: 0, msg: '验证码发送失败' }
-      }
-    } catch (error: any) {
-      // 错误 message
-      console.log(error.message)
-      // 诊断地址
-      console.log(error.data['Recommend'])
-      Util.assertAsString(error.message)
-      throw error
-    }
+    // let code = Client.generateOtp(4)
+
+    // let client = Client.createClient(
+    //   process.env.ALIBABA_CLOUD_ACCESS_KEY_ID!,
+    //   process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET!
+    // )
+    // let sendSmsRequest = new $Dysmsapi20170525.SendSmsRequest({
+    //   phoneNumbers: phone,
+    //   signName: 'EchoBlog',
+    //   templateCode: 'SMS_464486007',
+    //   templateParam: `{"code":${code}}`
+    // })
+    // let runtime = new $Util.RuntimeOptions({})
+    // try {
+    //   const { body } = await client.sendSmsWithOptions(sendSmsRequest, runtime)
+    //   switch (body.code) {
+    //     case 'OK':
+    //       return { status: 1, msg: code }
+    //     case 'isv.BUSINESS_LIMIT_CONTROL':
+    //       return { status: 0, msg: '今日发送频率已达上限' }
+    //     default:
+    //       console.log(body, `code:${code}`)
+    //       return { status: 0, msg: '验证码发送失败' }
+    //   }
+    // } catch (error: any) {
+    //   // 错误 message
+    //   console.log(error.message)
+    //   // 诊断地址
+    //   console.log(error.data['Recommend'])
+    //   Util.assertAsString(error.message)
+    //   throw error
+    // }
   }
 }

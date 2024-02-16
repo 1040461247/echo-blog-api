@@ -9,7 +9,7 @@ import redisExpire from '../utils/redis-expire'
 class AuthController {
   async login(ctx: DefaultContext) {
     const userInfo = ctx.user!
-    const token = signToken({ id: userInfo.id! })
+    const token = await signToken({ id: userInfo.id! })
     ctx.success({ ...userInfo, token })
   }
 
@@ -49,8 +49,9 @@ class AuthController {
         // 更新用户的system信息
         const { browser_info, os_info, ip_address } = getUserSystemInfo(ctx)
         usersService.updateUserSystemInfo(userInfo.id, browser_info, os_info, ip_address)
-        const token = signToken({ id: userInfo.id })
-        ctx.success({ status: 1, msg: '登陆成功', user: { id: userInfo.id, name: userInfo.name, token: token } })
+
+        const token = await signToken({ id: userInfo.id })
+        ctx.success({ status: 1, msg: '登录成功', user: { id: userInfo.id, name: userInfo.name, token: token } })
       } else {
         // 将信息存储在redis中，等待用户注册，30分钟后过期
         const redisClient = await getRedisClient()
