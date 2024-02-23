@@ -42,6 +42,30 @@ const { login, success, sended, loginPhone } = authController
 authRouter.post('/login', verifyAccount, updateUserSystemInfo, login)
 /**
  * @swagger
+ * /login-phone:
+ *   post:
+ *     tags: [Auth]
+ *     summary: 验证码登陆
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: 18669275339
+ *               otp:
+ *                 type: string
+ *                 exammple: 1234
+ *     responses:
+ *      200:
+ *        description: 发送成功
+ */
+authRouter.post('/login-phone', verifyOtp, loginPhone)
+/**
+ * @swagger
  * /authorized:
  *   get:
  *     tags: [Auth]
@@ -74,29 +98,5 @@ authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, success)
  *        description: 发送成功
  */
 authRouter.post('/send-otp', verifyPhone, sendOtp, sended)
-/**
- * @swagger
- * /login-phone:
- *   post:
- *     tags: [Auth]
- *     summary: 验证码登陆
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               phone:
- *                 type: string
- *                 example: 18669275339
- *               otp:
- *                 type: string
- *                 exammple: 1234
- *     responses:
- *      200:
- *        description: 发送成功
- */
-authRouter.post('/login-phone', verifyOtp, loginPhone)
 
 module.exports = authRouter
