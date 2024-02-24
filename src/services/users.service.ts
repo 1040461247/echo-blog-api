@@ -36,11 +36,7 @@ class UserService {
   async getUserById(userId: number) {
     try {
       const statement = `
-        SELECT users.*,
-          (SELECT JSON_ARRAYAGG(comment_likes.comment_id)
-          FROM comment_likes
-          WHERE comment_likes.user_id = users.id
-          GROUP BY comment_likes.user_id) AS commentLikesId
+        SELECT *
         FROM users
         WHERE id = ?;
       `

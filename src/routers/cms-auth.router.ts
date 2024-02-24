@@ -1,11 +1,11 @@
 import KoaRouter from '@koa/router'
-import authController from '../controllers/auth.controller'
+import cmsAuthController from '../controllers/cms-auth.controller'
 import { verifyAccount } from '../middlewares/auth.middleware'
 import { updateUserSystemInfo } from '../middlewares/users.middleware'
-import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { verifyAdmin, verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const cmsAuthRouter = new KoaRouter()
-const { login, success } = authController
+const { login, success } = cmsAuthController
 
 /**
  * @swagger
@@ -40,7 +40,7 @@ const { login, success } = authController
  *      200:
  *        description: 登录成功
  */
-cmsAuthRouter.post('/cms-login', verifyAccount, updateUserSystemInfo, login)
+cmsAuthRouter.post('/cms-login', verifyAccount, verifyAdmin, updateUserSystemInfo, login)
 /**
  * @swagger
  * /cms-authorized:

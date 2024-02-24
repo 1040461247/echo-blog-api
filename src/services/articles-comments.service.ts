@@ -105,6 +105,21 @@ class ArticlesCommentsService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
+  async getLikesByUserId(userId: number) {
+    try {
+      const statement = `
+        SELECT JSON_ARRAYAGG(comment_likes.comment_id) commentLikes
+        FROM comment_likes
+        WHERE comment_likes.user_id = ?
+        GROUP BY comment_likes.user_id;
+      `
+      const [res] = await connection.execute(statement, [userId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
 }
 
 export default new ArticlesCommentsService()

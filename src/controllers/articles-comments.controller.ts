@@ -100,6 +100,17 @@ class ArticlesCommentsController {
       ctx.fail(error)
     }
   }
+
+  async getLikesByUserId(ctx: DefaultContext) {
+    const { userId } = ctx.params
+
+    try {
+      const [{ commentLikes }] = (await articlesCommentsService.getLikesByUserId(userId)) as RowDataPacket[]
+      ctx.success(commentLikes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
 }
 
 export default new ArticlesCommentsController()

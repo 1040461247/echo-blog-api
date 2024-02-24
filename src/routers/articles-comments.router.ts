@@ -8,7 +8,7 @@ import {
 } from '../middlewares/message-record.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
-const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getLikesCountById } =
+const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getLikesCountById, getLikesByUserId } =
   articlesCommentsController
 
 /**
@@ -131,23 +131,6 @@ ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articl
 ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('articles_comments'), remove)
 /**
  * @swagger
- * /articles-comments:
- *  get:
- *    tags: [Articles Comments]
- *    summary: 根据文章id获取评论
- *    parameters:
- *      - in: query
- *        name: article_id
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 获取成功
- */
-ArticlesCommentsRouter.get('/', getCommentsById)
-/**
- * @swagger
  * /articles-comments/likes:
  *  post:
  *    tags: [Articles Comments]
@@ -193,6 +176,23 @@ ArticlesCommentsRouter.delete(
 )
 /**
  * @swagger
+ * /articles-comments:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据文章id获取评论
+ *    parameters:
+ *      - in: query
+ *        name: article_id
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/', getCommentsById)
+/**
+ * @swagger
  * /articles-comments/likes/{commentId}:
  *  get:
  *    tags: [Articles Comments]
@@ -208,5 +208,22 @@ ArticlesCommentsRouter.delete(
  *        description: 获取成功
  */
 ArticlesCommentsRouter.get('/likes/:commentId', getLikesCountById)
+/**
+ * @swagger
+ * /articles-comments/{userId}/likes:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据用户id获取点赞过的评论列表
+ *    parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/:userId/likes', getLikesByUserId)
 
 module.exports = ArticlesCommentsRouter
