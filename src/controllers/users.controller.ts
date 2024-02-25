@@ -74,16 +74,6 @@ class UsersController {
       ctx.fail(error)
     }
   }
-
-  async logout(ctx: DefaultContext) {
-    const userId = ctx.user?.id
-    try {
-      userId && (await remTokenFromWhiteList(String(userId)))
-      ctx.success(null, { msg: '用户已登出' })
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
 }
 
 export default new UsersController()

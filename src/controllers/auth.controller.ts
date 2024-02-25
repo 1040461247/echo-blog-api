@@ -2,7 +2,7 @@ import { DefaultContext } from 'koa'
 import getRedisClient, { OTPS_HASH, REGISTERING_SET } from '../app/redis'
 import authService from '../services/auth.service'
 import usersService from '../services/users.service'
-import { signToken } from '../utils/authorization'
+import { remTokenFromWhiteList, signToken } from '../utils/authorization'
 import getUserSystemInfo from '../utils/get-user-system-info'
 import redisExpire from '../utils/redis-expire'
 
@@ -60,6 +60,16 @@ class AuthController {
         redisClient.quit()
         ctx.success({ status: 0, msg: '用户未注册' })
       }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async logout(ctx: DefaultContext) {
+    const userId = ctx.user?.id
+    try {
+      userId && (await remTokenFromWhiteList(String(userId)))
+      ctx.success(null, { msg: '用户已登出' })
     } catch (error: any) {
       ctx.fail(error)
     }
