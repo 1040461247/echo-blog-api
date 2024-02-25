@@ -3,8 +3,17 @@ import articlesController from '../controllers/articles.controller'
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
-const { create, list, getArticleById, illustration, articleCover, removeCover, updateCategory, createTags } =
-  articlesController
+
+const {
+  createArticle,
+  getArticleList,
+  getArticleById,
+  getIllustration,
+  getArticleCover,
+  removeArticleCover,
+  updateAtcCategory,
+  createTagsToAtc
+} = articlesController
 
 /**
  * @swagger
@@ -16,44 +25,6 @@ const { create, list, getArticleById, illustration, articleCover, removeCover, u
  *      bearerFormat: JWT
  */
 
-/**
- * @swagger
- * /articles:
- *  post:
- *    tags: [Articles]
- *    summary: 新建文章
- *    security:
- *      - bearerAuth: []
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              title:
- *                type: string
- *                example: JavaScript从入门到放弃
- *              content:
- *                type: string
- *                example: hello world
- *              description:
- *                type: string
- *                example: article`s descripbe
- *              category_id:
- *                type: number
- *                example: 1
- *              cover_url:
- *                type: string
- *                required: false
- *              is_sticky:
- *                type: number
- *                required: false
- *    responses:
- *      200:
- *        description: 新建成功
- */
-articlesRouter.post('/', verifyAuth, create)
 /**
  * @swagger
  * /articles:
@@ -75,7 +46,8 @@ articlesRouter.post('/', verifyAuth, create)
  *      200:
  *        description: 获取成功
  */
-articlesRouter.get('/', list)
+articlesRouter.get('/', getArticleList)
+
 /**
  * @swagger
  * /articles/{articleId}:
@@ -111,7 +83,8 @@ articlesRouter.get('/:articleId', getArticleById)
  *      200:
  *        description: 返回文章配图
  */
-articlesRouter.get('/illustration/:filename', illustration)
+articlesRouter.get('/illustration/:filename', getIllustration)
+
 /**
  * @swagger
  * /articles/{articleId}/cover:
@@ -128,40 +101,16 @@ articlesRouter.get('/illustration/:filename', illustration)
  *      200:
  *        description: success
  */
-articlesRouter.get('/:articleId/cover', articleCover)
-/**
- * @swagger
- * /articles/{articleId}/cover:
- *  delete:
- *    tags: [Articles]
- *    summary: 删除文章封面
- *    security:
- *      - bearerAuth: []
- *    parameters:
- *      - in: path
- *        name: articleId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('articles'), removeCover)
+articlesRouter.get('/:articleId/cover', getArticleCover)
 
 /**
  * @swagger
- * /articles/{articleId}/category:
- *  patch:
+ * /articles:
+ *  post:
  *    tags: [Articles]
- *    summary: 修改文章分类
+ *    summary: 新建文章
  *    security:
  *      - bearerAuth: []
- *    parameters:
- *      - in: path
- *        name: articleId
- *        required: true
- *        example: 1
  *    requestBody:
  *      required: true
  *      content:
@@ -169,14 +118,29 @@ articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('article
  *          schema:
  *            type: object
  *            properties:
+ *              title:
+ *                type: string
+ *                example: JavaScript从入门到放弃
+ *              content:
+ *                type: string
+ *                example: hello world
+ *              description:
+ *                type: string
+ *                example: article`s descripbe
  *              categoryId:
  *                type: number
  *                example: 1
+ *              coverUrl:
+ *                type: string
+ *                required: false
+ *              isSticky:
+ *                type: number
+ *                required: false
  *    responses:
  *      200:
- *        description: success
+ *        description: 新建成功
  */
-articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('articles'), updateCategory)
+articlesRouter.post('/', verifyAuth, createArticle)
 
 /**
  * @swagger
@@ -206,6 +170,55 @@ articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('artic
  *      200:
  *        description: success
  */
-articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTags)
+articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTagsToAtc)
+
+/**
+ * @swagger
+ * /articles/{articleId}/category:
+ *  patch:
+ *    tags: [Articles]
+ *    summary: 修改文章分类
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        required: true
+ *        example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              categoryId:
+ *                type: number
+ *                example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('articles'), updateAtcCategory)
+
+/**
+ * @swagger
+ * /articles/{articleId}/cover:
+ *  delete:
+ *    tags: [Articles]
+ *    summary: 删除文章封面
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('articles'), removeArticleCover)
 
 module.exports = articlesRouter

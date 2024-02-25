@@ -2,83 +2,17 @@ import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 
 class ArticlesCommentsService {
-  async create(content: string, article_id: number, user_id: number) {
-    try {
-      const statement = `INSERT INTO articles_comments (content, article_id, user_id) VALUES (?, ?, ?);`
-      const [res] = await connection.execute(statement, [content, article_id, user_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async reply(content: string, article_id: number, user_id: number, comment_id: number) {
-    try {
-      const statement = `INSERT INTO articles_comments (content, article_id, user_id, comment_id) VALUES (?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [content, article_id, user_id, comment_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async update(content: string, comment_id: number) {
-    try {
-      const statement = `UPDATE articles_comments SET content = ? WHERE id = ?;`
-      const [res] = await connection.execute(statement, [content, comment_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async remove(comment_id: number) {
-    try {
-      const statement = `DELETE FROM articles_comments WHERE id = ?;`
-      const [res] = await connection.execute(statement, [comment_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async getCommentsById(article_id: number) {
+  async getCommentsByAtcId(articleId: number) {
     try {
       const statement = `
-        SELECT ac.id id, ac.content content, ac.comment_id comment_id, ac.create_time create_time, ac.update_time update_time,
+        SELECT ac.id id, ac.content content, ac.comment_id commentId, ac.create_time createTime, ac.update_time updateTime,
           (SELECT COUNT(*) FROM comment_likes WHERE comment_id = ac.id) totalLikes,
-          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url, 'browser_info', u.browser_info, 'os_info', u.os_info, 'ip_address', u.ip_address) user
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url, 'browserInfo', u.browser_info, 'osInfo', u.os_info, 'ipAddress', u.ip_address) user
         FROM articles_comments ac
         LEFT JOIN users u ON ac.user_id = u.id
         WHERE ac.article_id = ?;
       `
-      const [res] = await connection.execute(statement, [article_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async getCommentById(commentId: number) {
-    try {
-      const statement = `
-        SELECT ac.id id, ac.content content, ac.article_id article_id, ac.comment_id comment_id, ac.create_time create_time, ac.update_time update_time,
-          JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url, 'browser_info', u.browser_info, 'os_info', u.os_info, 'ip_address', u.ip_address) user
-        FROM articles_comments ac
-        LEFT JOIN users u ON ac.user_id = u.id
-        WHERE ac.id = ?;
-      `
-      const [res] = await connection.execute(statement, [commentId])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async addLikes(user_id: number, comment_id: number) {
-    try {
-      const statement = `INSERT INTO comment_likes (user_id, comment_id) VALUES (?, ?);`
-      const [res] = await connection.execute(statement, [user_id, comment_id])
+      const [res] = await connection.execute(statement, [articleId])
       return res
     } catch (error) {
       console.log(error)
@@ -86,20 +20,10 @@ class ArticlesCommentsService {
     }
   }
 
-  async remLikes(user_id: number, comment_id: number) {
-    try {
-      const statement = `DELETE FROM comment_likes WHERE user_id = ? AND comment_id = ?;`
-      const [res] = await connection.execute(statement, [user_id, comment_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async getLikesCountById(comment_id: number) {
+  async getLikesCountByCmtId(commentId: number) {
     try {
       const statement = `SELECT COUNT(*) totalLikes FROM comment_likes WHERE comment_id = ?;`
-      const [res] = await connection.execute(statement, [comment_id])
+      const [res] = await connection.execute(statement, [commentId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -115,6 +39,83 @@ class ArticlesCommentsService {
         GROUP BY comment_likes.user_id;
       `
       const [res] = await connection.execute(statement, [userId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getCommentById(commentId: number) {
+    try {
+      const statement = `
+        SELECT ac.id id, ac.content content, ac.article_id articleId, ac.comment_id commentId, ac.create_time createTime, ac.update_time updateTime,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url, 'browserInfo', u.browser_info, 'osInfo', u.os_info, 'ipAddress', u.ip_address) user
+        FROM articles_comments ac
+        LEFT JOIN users u ON ac.user_id = u.id
+        WHERE ac.id = ?;
+      `
+      const [res] = await connection.execute(statement, [commentId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createComment(content: string, articleId: number, userId: number) {
+    try {
+      const statement = `INSERT INTO articles_comments (content, article_id, user_id) VALUES (?, ?, ?);`
+      const [res] = await connection.execute(statement, [content, articleId, userId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createReply(content: string, articleId: number, userId: number, commentId: number) {
+    try {
+      const statement = `INSERT INTO articles_comments (content, article_id, user_id, comment_id) VALUES (?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [content, articleId, userId, commentId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createLikes(userId: number, commentId: number) {
+    try {
+      const statement = `INSERT INTO comment_likes (user_id, comment_id) VALUES (?, ?);`
+      const [res] = await connection.execute(statement, [userId, commentId])
+      return res
+    } catch (error) {
+      console.log(error)
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateComment(content: string, commentId: number) {
+    try {
+      const statement = `UPDATE articles_comments SET content = ? WHERE id = ?;`
+      const [res] = await connection.execute(statement, [content, commentId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async removeComment(commentId: number) {
+    try {
+      const statement = `DELETE FROM articles_comments WHERE id = ?;`
+      const [res] = await connection.execute(statement, [commentId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async removeLikes(userId: number, commentId: number) {
+    try {
+      const statement = `DELETE FROM comment_likes WHERE user_id = ? AND comment_id = ?;`
+      const [res] = await connection.execute(statement, [userId, commentId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)

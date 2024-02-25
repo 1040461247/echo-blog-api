@@ -27,23 +27,23 @@ interface IArticles {
   title: string
   content: string
   description: string
-  album_url?: string
-  user_id?: number
-  category_id: number
-  is_sticky?: 0 | 1
-  cover_url?: string
-  create_time?: string
-  update_time?: string
+  albumUrl?: string
+  userId?: number
+  categoryId: number
+  isSticky?: 0 | 1
+  coverUrl?: string
+  createTime?: string
+  updateTime?: string
 }
 
 interface IArticlesComments {
   id?: number
   content: string
-  article_id: number
-  user_id: number
-  comment_id?: number
-  create_time?: string
-  update_time?: string
+  articleId: number
+  userId: number
+  commentId?: number
+  createTime?: string
+  updateTime?: string
 }
 
 interface ICategories {

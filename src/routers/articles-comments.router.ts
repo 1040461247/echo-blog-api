@@ -8,8 +8,17 @@ import {
 } from '../middlewares/message-record.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
-const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getLikesCountById, getLikesByUserId } =
-  articlesCommentsController
+const {
+  createComment,
+  createReply,
+  updateComment,
+  removeComment,
+  getCommentsByAtcId,
+  createLikes,
+  removeLikes,
+  getLikesCountByCmtId,
+  getLikesByUserId
+} = articlesCommentsController
 
 /**
  * @swagger
@@ -20,6 +29,60 @@ const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getL
  *      scheme: bearer
  *      bearerFormat: JWT
  */
+
+/**
+ * @swagger
+ * /articles-comments:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据文章id获取评论
+ *    parameters:
+ *      - in: query
+ *        name: articleId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/', getCommentsByAtcId)
+
+/**
+ * @swagger
+ * /articles-comments/likes/{commentId}:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据评论id获取点赞数
+ *    parameters:
+ *      - in: path
+ *        name: commentId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/likes/:commentId', getLikesCountByCmtId)
+
+/**
+ * @swagger
+ * /articles-comments/{userId}/likes:
+ *  get:
+ *    tags: [Articles Comments]
+ *    summary: 根据用户id获取点赞过的评论列表
+ *    parameters:
+ *      - in: path
+ *        name: userId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+ArticlesCommentsRouter.get('/:userId/likes', getLikesByUserId)
 
 /**
  * @swagger
@@ -39,17 +102,18 @@ const { create, reply, update, remove, getCommentsById, addLikes, remLikes, getL
  *              content:
  *                type: string
  *                example: php是世界上最好的语言
- *              article_id:
+ *              articleId:
  *                type: number
  *                example: 1
- *              user_id:
+ *              userId:
  *                type: number
  *                example: 1
  *    responses:
  *      200:
  *        description: 评论成功
  */
-ArticlesCommentsRouter.post('/', verifyAuth, recordMessageOfComment, create)
+ArticlesCommentsRouter.post('/', verifyAuth, recordMessageOfComment, createComment)
+
 /**
  * @swagger
  * /articles-comments/{commentId}/reply:
@@ -73,17 +137,42 @@ ArticlesCommentsRouter.post('/', verifyAuth, recordMessageOfComment, create)
  *              content:
  *                type: string
  *                example: php是世界上最好的语言
- *              article_id:
+ *              articleId:
  *                type: number
  *                example: 1
- *              user_id:
+ *              userId:
  *                type: number
  *                example: 1
  *    responses:
  *      200:
  *        description: 回复成功
  */
-ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, recordMessageOfReply, reply)
+ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, recordMessageOfReply, createReply)
+
+/**
+ * @swagger
+ * /articles-comments/likes:
+ *  post:
+ *    tags: [Articles Comments]
+ *    summary: 点赞评论
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              commentId:
+ *                type: number
+ *                example: 1
+ *    responses:
+ *      200:
+ *        description: 点赞成功
+ */
+ArticlesCommentsRouter.post('/likes', verifyAuth, recordMessageOfLikeComment, createLikes)
+
 /**
  * @swagger
  * /articles-comments/{commentId}:
@@ -111,7 +200,8 @@ ArticlesCommentsRouter.post('/:commentId/reply', verifyAuth, recordMessageOfRepl
  *      200:
  *        description: 修改成功
  */
-ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articles_comments'), update)
+ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articles_comments'), updateComment)
+
 /**
  * @swagger
  * /articles-comments/{commentId}:
@@ -128,30 +218,8 @@ ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articl
  *      200:
  *        description: 删除成功
  */
-ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('articles_comments'), remove)
-/**
- * @swagger
- * /articles-comments/likes:
- *  post:
- *    tags: [Articles Comments]
- *    summary: 点赞评论
- *    security:
- *      - bearerAuth: []
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              comment_id:
- *                type: number
- *                example: 1
- *    responses:
- *      200:
- *        description: 点赞成功
- */
-ArticlesCommentsRouter.post('/likes', verifyAuth, recordMessageOfLikeComment, addLikes)
+ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('articles_comments'), removeComment)
+
 /**
  * @swagger
  * /articles-comments/likes/{commentId}:
@@ -172,58 +240,7 @@ ArticlesCommentsRouter.delete(
   '/likes/:commentId',
   verifyAuth,
   verifyPermission('comment_likes', 'comment_id'),
-  remLikes
+  removeLikes
 )
-/**
- * @swagger
- * /articles-comments:
- *  get:
- *    tags: [Articles Comments]
- *    summary: 根据文章id获取评论
- *    parameters:
- *      - in: query
- *        name: article_id
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 获取成功
- */
-ArticlesCommentsRouter.get('/', getCommentsById)
-/**
- * @swagger
- * /articles-comments/likes/{commentId}:
- *  get:
- *    tags: [Articles Comments]
- *    summary: 根据评论id获取点赞数
- *    parameters:
- *      - in: path
- *        name: commentId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 获取成功
- */
-ArticlesCommentsRouter.get('/likes/:commentId', getLikesCountById)
-/**
- * @swagger
- * /articles-comments/{userId}/likes:
- *  get:
- *    tags: [Articles Comments]
- *    summary: 根据用户id获取点赞过的评论列表
- *    parameters:
- *      - in: path
- *        name: userId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 获取成功
- */
-ArticlesCommentsRouter.get('/:userId/likes', getLikesByUserId)
 
 module.exports = ArticlesCommentsRouter

@@ -4,26 +4,65 @@ import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { IArticlesComments } from '../types'
 
 class ArticlesCommentsController {
-  async create(ctx: DefaultContext) {
-    const { content, article_id, user_id } = ctx.request.body as IArticlesComments
-
+  async getCommentsByAtcId(ctx: DefaultContext) {
     try {
-      const insertRes = (await articlesCommentsService.create(content, article_id, user_id)) as OkPacketParams
+      const { articleId } = ctx.query
+      const queryRes = (await articlesCommentsService.getCommentsByAtcId(articleId)) as IArticlesComments[]
+      ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getLikesCountByCmtId(ctx: DefaultContext) {
+    try {
+      const { commentId } = ctx.params
+      const [queryRes] = (await articlesCommentsService.getLikesCountByCmtId(commentId)) as RowDataPacket[]
+      ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getLikesByUserId(ctx: DefaultContext) {
+    try {
+      const { userId } = ctx.params
+      const [{ commentLikes }] = (await articlesCommentsService.getLikesByUserId(userId)) as RowDataPacket[]
+      ctx.success(commentLikes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createComment(ctx: DefaultContext) {
+    try {
+      const { content, articleId, userId } = ctx.request.body as IArticlesComments
+      const insertRes = (await articlesCommentsService.createComment(content, articleId, userId)) as OkPacketParams
       ctx.success({ inesrtId: insertRes.insertId }, {})
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async reply(ctx: DefaultContext) {
-    const { content, article_id, user_id } = ctx.request.body as IArticlesComments
-    const { commentId } = ctx.params
-
+  async createLikes(ctx: DefaultContext) {
     try {
-      const insertRes = (await articlesCommentsService.reply(
+      const { commentId } = ctx.request.body
+      const { id } = ctx.user!
+      await articlesCommentsService.createLikes(id!, commentId)
+      ctx.success(null, { msg: '点赞成功' })
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createReply(ctx: DefaultContext) {
+    try {
+      const { content, articleId, userId } = ctx.request.body as IArticlesComments
+      const { commentId } = ctx.params
+      const insertRes = (await articlesCommentsService.createReply(
         content,
-        article_id,
-        user_id,
+        articleId,
+        userId,
         commentId!
       )) as OkPacketParams
       ctx.success({ inesrtId: insertRes.insertId }, {})
@@ -32,81 +71,34 @@ class ArticlesCommentsController {
     }
   }
 
-  async update(ctx: DefaultContext) {
-    const { commentId } = ctx.params
-    const { content } = ctx.request.body
-
+  async updateComment(ctx: DefaultContext) {
     try {
-      await articlesCommentsService.update(content, commentId)
+      const { commentId } = ctx.params
+      const { content } = ctx.request.body
+      await articlesCommentsService.updateComment(content, commentId)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async remove(ctx: DefaultContext) {
-    const { commentId } = ctx.params
-
+  async removeComment(ctx: DefaultContext) {
     try {
-      await articlesCommentsService.remove(commentId)
+      const { commentId } = ctx.params
+      await articlesCommentsService.removeComment(commentId)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async getCommentsById(ctx: DefaultContext) {
-    const { article_id } = ctx.query
-
+  async removeLikes(ctx: DefaultContext) {
     try {
-      const queryRes = (await articlesCommentsService.getCommentsById(article_id)) as IArticlesComments[]
-      ctx.success(queryRes)
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
+      const { commentId } = ctx.params
+      const { id } = ctx.user!
 
-  async addLikes(ctx: DefaultContext) {
-    const { comment_id } = ctx.request.body
-    const { id } = ctx.user!
-
-    try {
-      await articlesCommentsService.addLikes(id!, comment_id)
-      ctx.success(null, { msg: '点赞成功' })
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async remLikes(ctx: DefaultContext) {
-    const { commentId } = ctx.params
-    const { id } = ctx.user!
-
-    try {
-      await articlesCommentsService.remLikes(id!, commentId)
+      await articlesCommentsService.removeLikes(id!, commentId)
       ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async getLikesCountById(ctx: DefaultContext) {
-    const { commentId } = ctx.params
-
-    try {
-      const [queryRes] = (await articlesCommentsService.getLikesCountById(commentId)) as RowDataPacket[]
-      ctx.success(queryRes)
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async getLikesByUserId(ctx: DefaultContext) {
-    const { userId } = ctx.params
-
-    try {
-      const [{ commentLikes }] = (await articlesCommentsService.getLikesByUserId(userId)) as RowDataPacket[]
-      ctx.success(commentLikes)
     } catch (error: any) {
       ctx.fail(error)
     }

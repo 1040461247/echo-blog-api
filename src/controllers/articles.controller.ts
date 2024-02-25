@@ -1,44 +1,25 @@
 import fs from 'fs'
 import articlesService from '../services/articles.service'
 import fileService from '../services/file.service'
-import tagsService from '../services/tags.service'
 import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
-import type { OkPacketParams, RowDataPacket } from 'mysql2'
+import type { OkPacketParams } from 'mysql2'
 import type { IArticles, IFileIllustration } from '../types'
 
+function mapTagsToJson(queryRes: any) {
+  return queryRes.map((item: any) => {
+    const articleList = { ...item }
+    articleList.tags = JSON.parse(item.tags)
+    return articleList
+  })
+}
+
 class ArticlesController {
-  async create(ctx: DefaultContext) {
-    const { title, content, category_id, cover_url, is_sticky, description } = ctx.request.body as IArticles
-    const { id } = ctx.user!
-
+  async getArticleList(ctx: DefaultContext) {
     try {
-      const insertRes = (await articlesService.create(
-        title,
-        content,
-        id!,
-        cover_url,
-        category_id,
-        is_sticky,
-        description
-      )) as OkPacketParams
-      ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async list(ctx: DefaultContext) {
-    const { offset, limit } = ctx.query
-
-    try {
-      const queryRes = (await articlesService.getList(offset, limit)) as any[]
-      // 将tags数组序列化为json
-      const articleList = queryRes.map((item) => {
-        const articleList = { ...item }
-        articleList.tags = JSON.parse(item.tags)
-        return articleList
-      })
+      const { offset, limit } = ctx.query
+      const queryRes = (await articlesService.getArticleList(offset, limit)) as any[]
+      const articleList = mapTagsToJson(queryRes)
       ctx.success(articleList)
     } catch (error: any) {
       ctx.fail(error)
@@ -46,27 +27,21 @@ class ArticlesController {
   }
 
   async getArticleById(ctx: DefaultContext) {
-    const { articleId } = ctx.params
-
     try {
+      const { articleId } = ctx.params
       const queryRes = (await articlesService.getArticleById(articleId)) as any[]
-      // 将tags数组序列化为json
-      const articleList = queryRes.map((item) => {
-        const articleList = { ...item }
-        articleList.tags = JSON.parse(item.tags)
-        return articleList
-      })
+      const articleList = mapTagsToJson(queryRes)
       ctx.success(articleList[0])
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async illustration(ctx: DefaultContext) {
-    const { filename } = ctx.params
-
+  async getIllustration(ctx: DefaultContext) {
     try {
+      const { filename } = ctx.params
       const queryRes = (await articlesService.getIllustrationByFilename(filename)) as IFileIllustration
+
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
         ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${filename}`)
@@ -76,11 +51,11 @@ class ArticlesController {
     }
   }
 
-  async articleCover(ctx: DefaultContext) {
-    const { articleId } = ctx.params
-
+  async getArticleCover(ctx: DefaultContext) {
     try {
+      const { articleId } = ctx.params
       const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
+
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
         ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
@@ -90,50 +65,69 @@ class ArticlesController {
     }
   }
 
-  async removeCover(ctx: DefaultContext) {
-    const { articleId } = ctx.params
-    const promiseList = []
-
+  async createArticle(ctx: DefaultContext) {
     try {
-      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
-      if (!queryRes) return ctx.success(undefined, { msg: '文章封面不存在' })
+      const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request.body as IArticles
+      const { id } = ctx.user!
 
-      const { filename, article_id } = queryRes
+      const insertRes = (await articlesService.createArticle(
+        title,
+        content,
+        id!,
+        categoryId,
+        coverUrl,
+        isSticky,
+        description
+      )) as OkPacketParams
+      ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createTagsToAtc(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      const { tagIds } = ctx.request.body
+      const promiseList = []
+
+      await articlesService.clearTags(articleId)
+      for (const tagId of tagIds) {
+        promiseList.push(articlesService.createTagToAtc(articleId, tagId))
+      }
+      await Promise.all(promiseList)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async updateAtcCategory(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      const { categoryId } = ctx.request.body
+      await articlesService.updateAtcCategory(articleId, categoryId)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeArticleCover(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
+      if (!queryRes) {
+        return ctx.success(null, { msg: '文章封面不存在' })
+      }
+
+      const { filename } = queryRes
+      const promiseList = []
       promiseList.push(fs.promises.unlink(`${ILLUSTRATION_PATH}/${filename}`))
       promiseList.push(fileService.removeCover(articleId))
       promiseList.push(articlesService.removeArticleCover(articleId))
       await Promise.all(promiseList)
 
-      ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async updateCategory(ctx: DefaultContext) {
-    const { articleId } = ctx.params
-    const { categoryId } = ctx.request.body
-
-    try {
-      await articlesService.updateCategory(articleId, categoryId)
-      ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async createTags(ctx: DefaultContext) {
-    const { articleId } = ctx.params
-    const { tagIds } = ctx.request.body
-    const promiseList = []
-
-    try {
-      await articlesService.clearTags(articleId)
-
-      for (const tagId of tagIds) {
-        promiseList.push(articlesService.createTag(articleId, tagId))
-      }
-      await Promise.all(promiseList)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

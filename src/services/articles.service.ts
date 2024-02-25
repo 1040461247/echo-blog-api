@@ -2,40 +2,13 @@ import connection from '../app/database'
 import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
-import sortArticles from '../utils/sort-articles'
 
 class ArticlesService {
-  async create(
-    title: string,
-    content: string,
-    user_id: number,
-    cover_url = '',
-    category_id: number,
-    is_sticky = 0,
-    description: string
-  ) {
-    try {
-      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky, description) VALUES (?, ?, ?, ?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [
-        title,
-        content,
-        user_id,
-        cover_url,
-        category_id,
-        is_sticky,
-        description
-      ])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async getList(offset = 0, limit = 10) {
+  async getArticleList(offset = 0, limit = 10) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.description, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
-        JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+      SELECT atc.id, atc.title, atc.description, atc.cover_url coverUrl, atc.create_time createTime, atc.update_time updateTime, atc.is_sticky isSticky,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
               COALESCE(
@@ -64,8 +37,8 @@ class ArticlesService {
   async getArticleById(articleId: number) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.description, atc.cover_url, atc.create_time, atc.update_time, atc.is_sticky,
-        JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+      SELECT atc.id, atc.title, atc.content, atc.description, atc.cover_url coverUrl, atc.create_time createTime, atc.update_time updateTime, atc.is_sticky isSticky,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
               COALESCE(
@@ -111,6 +84,42 @@ class ArticlesService {
     }
   }
 
+  async createArticle(
+    title: string,
+    content: string,
+    userId: number,
+    categoryId: number,
+    coverUrl = '',
+    isSticky = 0,
+    description: string
+  ) {
+    try {
+      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky, description) VALUES (?, ?, ?, ?, ?, ?, ?);`
+      const [res] = await connection.execute(statement, [
+        title,
+        content,
+        userId,
+        coverUrl,
+        categoryId,
+        isSticky,
+        description
+      ])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createTagToAtc(articleId: number, tagId: number) {
+    try {
+      const statement = `INSERT INTO articles_ref_tags (article_id, tag_id) VALUES(?, ?);`
+      const [res] = await connection.execute(statement, [articleId, tagId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
   async updateArticleCover(articleId: number) {
     const coverUrl = `${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}/articles/${articleId}/cover`
     try {
@@ -126,21 +135,7 @@ class ArticlesService {
     }
   }
 
-  async removeArticleCover(articleId: number) {
-    try {
-      const statement = `
-        UPDATE articles
-        SET cover_url = null
-        WHERE id = ?;
-      `
-      const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
-      return res[0]
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async updateCategory(articleId: number, categoryId: number) {
+  async updateAtcCategory(articleId: number, categoryId: number) {
     try {
       const statement = `
         UPDATE articles
@@ -154,11 +149,15 @@ class ArticlesService {
     }
   }
 
-  async createTag(articleId: number, tagId: number) {
+  async removeArticleCover(articleId: number) {
     try {
-      const statement = `INSERT INTO articles_ref_tags (article_id, tag_id) VALUES(?, ?);`
-      const [res] = await connection.execute(statement, [articleId, tagId])
-      return res
+      const statement = `
+        UPDATE articles
+        SET cover_url = null
+        WHERE id = ?;
+      `
+      const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
+      return res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
