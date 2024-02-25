@@ -4,46 +4,18 @@ import type { OkPacketParams } from 'mysql2'
 import type { ICategories } from '../types'
 
 class CategoriesController {
-  async create(ctx: DefaultContext) {
-    const { category } = ctx.request.body
-
+  async getCategoryList(ctx: DefaultContext) {
     try {
-      const hasCategory = await categoriesService.hasCategory(category)
-      if (hasCategory) {
-        return ctx.success(undefined, { msg: '分类已存在' })
-      } else {
-        const insertRes = (await categoriesService.create(category)) as OkPacketParams
-        ctx.success({ insertId: insertRes.insertId })
-      }
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async list(ctx: DefaultContext) {
-    try {
-      const queryRes = (await categoriesService.getList()) as ICategories[]
+      const queryRes = (await categoriesService.getCategoryList()) as ICategories[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async remove(ctx: DefaultContext) {
-    const { categoryId } = ctx.params
-
-    try {
-      await categoriesService.remove(categoryId)
-      ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
   async getCategoryById(ctx: DefaultContext) {
-    const { categoryId } = ctx.params
-
     try {
+      const { categoryId } = ctx.params
       const queryRes = (await categoriesService.getCategoryById(categoryId)) as ICategories[]
       ctx.success(queryRes[0])
     } catch (error: any) {
@@ -52,10 +24,35 @@ class CategoriesController {
   }
 
   async getArticlesByCateId(ctx: DefaultContext) {
-    const { categoryId } = ctx.params
     try {
+      const { categoryId } = ctx.params
       const queryRes = await categoriesService.getArticlesByCateId(categoryId)
       ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createCategory(ctx: DefaultContext) {
+    try {
+      const { category } = ctx.request.body
+      const hasCategory = await categoriesService.hasCategory(category)
+      if (hasCategory) {
+        return ctx.success(undefined, { msg: '分类已存在' })
+      } else {
+        const insertRes = (await categoriesService.createCategory(category)) as OkPacketParams
+        ctx.success({ insertId: insertRes.insertId })
+      }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeCategory(ctx: DefaultContext) {
+    try {
+      const { categoryId } = ctx.params
+      await categoriesService.removeCategory(categoryId)
+      ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }

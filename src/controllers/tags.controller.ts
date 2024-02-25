@@ -4,46 +4,18 @@ import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { ITags } from '../types'
 
 class TagsController {
-  async create(ctx: DefaultContext) {
-    const { tag } = ctx.request.body
-
+  async getTagList(ctx: DefaultContext) {
     try {
-      const hasTag = await tagsService.hasTag(tag)
-      if (hasTag) {
-        return ctx.success(undefined, { msg: '标签已存在' })
-      } else {
-        const insertRes = (await tagsService.create(tag)) as OkPacketParams
-        ctx.success({ insertId: insertRes.insertId })
-      }
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async list(ctx: DefaultContext) {
-    try {
-      const queryRes = (await tagsService.getList()) as ITags[]
+      const queryRes = (await tagsService.getTagList()) as ITags[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async remove(ctx: DefaultContext) {
-    const { tagId } = ctx.params
-
-    try {
-      await tagsService.remove(tagId)
-      ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
   async getTagById(ctx: DefaultContext) {
-    const { tagId } = ctx.params
-
     try {
+      const { tagId } = ctx.params
       const queryRes = (await tagsService.getTagById(tagId)) as ITags[]
       ctx.success(queryRes[0])
     } catch (error: any) {
@@ -52,11 +24,36 @@ class TagsController {
   }
 
   async getArticlesByTagId(ctx: DefaultContext) {
-    const { tagId } = ctx.params
-
     try {
+      const { tagId } = ctx.params
       const queryRes = (await tagsService.getArticlesByTagId(tagId)) as RowDataPacket[]
       ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createTag(ctx: DefaultContext) {
+    try {
+      const { tag } = ctx.request.body
+      const hasTag = await tagsService.hasTag(tag)
+
+      if (hasTag) {
+        ctx.success(undefined, { msg: '标签已存在' })
+      } else {
+        const insertRes = (await tagsService.createTag(tag)) as OkPacketParams
+        ctx.success({ insertId: insertRes.insertId })
+      }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeTag(ctx: DefaultContext) {
+    try {
+      const { tagId } = ctx.params
+      await tagsService.removeTagById(tagId)
+      ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }

@@ -4,7 +4,7 @@ import { sendOtp, verifyAccount, verifyAuth, verifyOtp, verifyPhone } from '../m
 import { updateUserSystemInfo } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()
-const { login, success, sended, loginPhone, logout } = authController
+const { loginByAccount, validated, sendedOtp, loginByPhone, logout } = authController
 
 /**
  * @swagger
@@ -15,6 +15,20 @@ const { login, success, sended, loginPhone, logout } = authController
  *      scheme: bearer
  *      bearerFormat: JWT
  */
+
+/**
+ * @swagger
+ * /authorized:
+ *   get:
+ *     tags: [Auth]
+ *     summary: 用户鉴权
+ *     security:
+ *      - bearerAuth: []
+ *     responses:
+ *      200:
+ *        description: 鉴权通过
+ */
+authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, validated)
 
 /**
  * @swagger
@@ -39,7 +53,8 @@ const { login, success, sended, loginPhone, logout } = authController
  *      200:
  *        description: 登录成功
  */
-authRouter.post('/login', verifyAccount, updateUserSystemInfo, login)
+authRouter.post('/login', verifyAccount, updateUserSystemInfo, loginByAccount)
+
 /**
  * @swagger
  * /login-phone:
@@ -63,20 +78,8 @@ authRouter.post('/login', verifyAccount, updateUserSystemInfo, login)
  *      200:
  *        description: 发送成功
  */
-authRouter.post('/login-phone', verifyOtp, loginPhone)
-/**
- * @swagger
- * /authorized:
- *   get:
- *     tags: [Auth]
- *     summary: 用户鉴权
- *     security:
- *      - bearerAuth: []
- *     responses:
- *      200:
- *        description: 鉴权通过
- */
-authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, success)
+authRouter.post('/login-phone', verifyOtp, loginByPhone)
+
 /**
  * @swagger
  * /send-otp:
@@ -97,7 +100,8 @@ authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, success)
  *      200:
  *        description: 发送成功
  */
-authRouter.post('/send-otp', verifyPhone, sendOtp, sended)
+authRouter.post('/send-otp', verifyPhone, sendOtp, sendedOtp)
+
 /**
  * @swagger
  * /logout:

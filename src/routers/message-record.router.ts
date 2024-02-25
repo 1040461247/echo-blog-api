@@ -3,7 +3,7 @@ import messageRecordController from '../controllers/message-record.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const messageRecordRouter = new KoaRouter({ prefix: '/message-record' })
-const { list, clearUnread, total } = messageRecordController
+const { getMsgListByUserId, clearUnread, getMsgTotal } = messageRecordController
 
 /**
  * @swagger
@@ -47,7 +47,8 @@ const { list, clearUnread, total } = messageRecordController
  *      200:
  *        description: success
  */
-messageRecordRouter.get('/:userId', list)
+messageRecordRouter.get('/:userId', getMsgListByUserId)
+
 /**
  * @swagger
  * /message-record/{userId}/total/:
@@ -65,7 +66,8 @@ messageRecordRouter.get('/:userId', list)
  *      200:
  *        description: success
  */
-messageRecordRouter.get('/:userId/total', total)
+messageRecordRouter.get('/:userId/total', getMsgTotal)
+
 /**
  * @swagger
  * /message-record:

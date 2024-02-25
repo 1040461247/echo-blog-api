@@ -4,7 +4,57 @@ import { verifyRegisterInfo, encrypPwd } from '../middlewares/users.middleware'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const usersRouter = new KoaRouter({ prefix: '/users' })
-const { create, list, getAvatarById, getUserById, update } = usersController
+const { createUser, getUserList, getAvatarByUserId, getUserById, updateUser } = usersController
+
+/**
+ * @swagger
+ * /users:
+ *  get:
+ *    tags: [Users]
+ *    summary: 获取用户列表
+ *    responses:
+ *      200:
+ *        description: 返回用户列表
+ */
+usersRouter.get('/', getUserList)
+
+/**
+ * @swagger
+ * /users/{userId}/avatar:
+ *  get:
+ *    tags: [Users]
+ *    summary: 获取用户头像
+ *    parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 返回用户头像
+ */
+usersRouter.get('/:userId/avatar', getAvatarByUserId)
+
+/**
+ * @swagger
+ * /users/{userId}:
+ *  get:
+ *    tags: [Users]
+ *    summary: 获取用户信息
+ *    parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: 获取成功
+ */
+usersRouter.get('/:userId', getUserById)
 
 /**
  * @swagger
@@ -25,14 +75,15 @@ const { create, list, getAvatarById, getUserById, update } = usersController
  *               password:
  *                 type: string
  *                 example: 123456
- *               phone_num:
+ *               phoneNum:
  *                 type: string
  *                 example: 18669275339
  *     responses:
  *       200:
  *         description: 用户注册成功
  */
-usersRouter.post('/', verifyRegisterInfo, encrypPwd, create, update)
+usersRouter.post('/', verifyRegisterInfo, encrypPwd, createUser)
+
 /**
  * @swagger
  * /users/update:
@@ -57,53 +108,6 @@ usersRouter.post('/', verifyRegisterInfo, encrypPwd, create, update)
  *      200:
  *        description: success
  */
-usersRouter.post('/update', verifyAuth, encrypPwd, update)
-/**
- * @swagger
- * /users:
- *  get:
- *    tags: [Users]
- *    summary: 获取用户列表
- *    responses:
- *      200:
- *        description: 返回用户列表
- */
-usersRouter.get('/', list)
-/**
- * @swagger
- * /users/{userId}/avatar:
- *  get:
- *    tags: [Users]
- *    summary: 获取用户头像
- *    parameters:
- *      - in: path
- *        name: userId
- *        required: true
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 返回用户头像
- */
-usersRouter.get('/:userId/avatar', getAvatarById)
-/**
- * @swagger
- * /users/{userId}:
- *  get:
- *    tags: [Users]
- *    summary: 获取用户信息
- *    parameters:
- *      - in: path
- *        name: userId
- *        required: true
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: 获取成功
- */
-usersRouter.get('/:userId', getUserById)
+usersRouter.post('/update', verifyAuth, encrypPwd, updateUser)
 
 module.exports = usersRouter

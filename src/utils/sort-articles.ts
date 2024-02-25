@@ -3,9 +3,9 @@ function sortArticles(articles: any[]) {
   const otherAtcs: any[] = []
 
   articles.forEach((item: any) => {
-    if (item.is_sticky === 1) {
+    if (item.isSticky === 1) {
       stickyAtcs.push(item)
-    } else if (item.is_sticky === 0) {
+    } else if (item.isSticky === 0) {
       otherAtcs.push(item)
     }
   })

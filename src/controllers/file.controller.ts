@@ -10,11 +10,11 @@ import usersService from '../services/users.service'
 
 class FileController {
   async createAvatar(ctx: DefaultContext) {
-    const { filename, mimetype, size } = ctx.req.file
-    const { id } = ctx.user!
-
     try {
-      const uesrAvatar = (await userService.getAvatarById(id!)) as IFileAvatar
+      const { filename, mimetype, size } = ctx.req.file
+      const { id } = ctx.user!
+
+      const uesrAvatar = (await userService.getAvatarByUserId(id!)) as IFileAvatar
       if (uesrAvatar) {
         // 头像已存在，删除源文件并更新
         await fs.unlink(`${AVATAR_PATH}/${uesrAvatar.filename}`)
@@ -33,10 +33,10 @@ class FileController {
   }
 
   async createIllustration(ctx: DefaultContext) {
-    const files = ctx.req.files
-    const { articleId } = ctx.query
-
     try {
+      const files = ctx.req.files
+      const { articleId } = ctx.query
+
       for (const file of files) {
         const { filename, mimetype, size } = file
         await fileService.createIllustration(filename, mimetype, size, articleId)
@@ -48,10 +48,10 @@ class FileController {
   }
 
   async createCover(ctx: DefaultContext) {
-    const { filename, mimetype, size } = ctx.req.file
-    const { articleId } = ctx.params
-
     try {
+      const { filename, mimetype, size } = ctx.req.file
+      const { articleId } = ctx.params
+
       const articleCover = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
       if (articleCover) {
         // 封面已存在，删除源文件并更新

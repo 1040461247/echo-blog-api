@@ -5,7 +5,7 @@ import { updateUserSystemInfo } from '../middlewares/users.middleware'
 import { verifyAdmin, verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const cmsAuthRouter = new KoaRouter()
-const { login, success } = cmsAuthController
+const { login, validated } = cmsAuthController
 
 /**
  * @swagger
@@ -41,6 +41,7 @@ const { login, success } = cmsAuthController
  *        description: 登录成功
  */
 cmsAuthRouter.post('/cms-login', verifyAccount, verifyAdmin, updateUserSystemInfo, login)
+
 /**
  * @swagger
  * /cms-authorized:
@@ -53,6 +54,6 @@ cmsAuthRouter.post('/cms-login', verifyAccount, verifyAdmin, updateUserSystemInf
  *      200:
  *        description: 鉴权通过
  */
-cmsAuthRouter.get('/cms-authorized', verifyAuthCms, updateUserSystemInfo, success)
+cmsAuthRouter.get('/cms-authorized', verifyAuthCms, updateUserSystemInfo, validated)
 
 module.exports = cmsAuthRouter

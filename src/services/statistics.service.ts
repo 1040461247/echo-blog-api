@@ -3,11 +3,11 @@ import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 
 class StatisticsService {
-  async getTotal(resourceList: string[]) {
-    const promiseList = []
-
+  async getStatisticsTotal(resourceList: string[]) {
     try {
+      const promiseList = []
       const resObj = {}
+
       for (const resource of resourceList) {
         const statement = `SELECT COUNT(*) ${resource}Count FROM ${resource};`
         const res = connection.execute(statement).then((res: any) => {

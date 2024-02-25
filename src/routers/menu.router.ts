@@ -2,7 +2,7 @@ import KoaRouter from '@koa/router'
 import menuController from '../controllers/menu.controller'
 
 const menuRouter = new KoaRouter({ prefix: '/menu' })
-const { getMenusByUserId } = menuController
+const { getMenuListByUserId } = menuController
 
 /**
  * @swagger
@@ -30,6 +30,6 @@ const { getMenusByUserId } = menuController
  *      200:
  *        description: success
  */
-menuRouter.get('/:userId', getMenusByUserId)
+menuRouter.get('/:userId', getMenuListByUserId)
 
 module.exports = menuRouter

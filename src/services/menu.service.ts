@@ -2,7 +2,7 @@ import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 
 class MenuService {
-  async getMenusByUserId(userId: number) {
+  async getMenuListByUserId(userId: number) {
     try {
       const statement = `
         SELECT DISTINCT menu.id, menu.name, menu.parent_id parentId

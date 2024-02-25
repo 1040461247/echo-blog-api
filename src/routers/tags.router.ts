@@ -3,7 +3,7 @@ import tagsController from '../controllers/tags.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const tagsRouter = new KoaRouter({ prefix: '/tags' })
-const { create, list, remove, getTagById, getArticlesByTagId } = tagsController
+const { createTag, getTagList, removeTag, getTagById, getArticlesByTagId } = tagsController
 
 /**
  * @swagger
@@ -14,6 +14,54 @@ const { create, list, remove, getTagById, getArticlesByTagId } = tagsController
  *      scheme: bearer
  *      bearerFormat: JWT
  */
+
+/**
+ * @swagger
+ * /tags:
+ *  get:
+ *    tags: [Tags]
+ *    summary: 获取标签列表
+ *    responses:
+ *      200:
+ *        description: 返回标签列表
+ */
+tagsRouter.get('/', getTagList)
+
+/**
+ * @swagger
+ * /tags/{tagId}:
+ *  get:
+ *    tags: [Tags]
+ *    summary: 根据id获取标签信息
+ *    parameters:
+ *      - in: path
+ *        name: tagId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+tagsRouter.get('/:tagId', getTagById)
+
+/**
+ * @swagger
+ * /tags/{tagId}/articles:
+ *  get:
+ *    tags: [Tags]
+ *    summary: 根据tagId获取相关文章列表
+ *    parameters:
+ *      - in: path
+ *        name: tagId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+tagsRouter.get('/:tagId/articles', getArticlesByTagId)
 
 /**
  * @swagger
@@ -37,18 +85,8 @@ const { create, list, remove, getTagById, getArticlesByTagId } = tagsController
  *      200:
  *        description: 新建成功
  */
-tagsRouter.post('/', verifyAuth, create)
-/**
- * @swagger
- * /tags:
- *  get:
- *    tags: [Tags]
- *    summary: 获取标签列表
- *    responses:
- *      200:
- *        description: 返回标签列表
- */
-tagsRouter.get('/', list)
+tagsRouter.post('/', verifyAuth, createTag)
+
 /**
  * @swagger
  * /tags/{tagId}:
@@ -66,40 +104,6 @@ tagsRouter.get('/', list)
  *      200:
  *        description: success
  */
-tagsRouter.delete('/:tagId', verifyAuth, remove)
-/**
- * @swagger
- * /tags/{tagId}:
- *  get:
- *    tags: [Tags]
- *    summary: 根据id获取标签信息
- *    parameters:
- *      - in: path
- *        name: tagId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-tagsRouter.get('/:tagId', getTagById)
-/**
- * @swagger
- * /tags/{tagId}/articles:
- *  get:
- *    tags: [Tags]
- *    summary: 根据tagId获取相关文章列表
- *    parameters:
- *      - in: path
- *        name: tagId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-tagsRouter.get('/:tagId/articles', getArticlesByTagId)
+tagsRouter.delete('/:tagId', verifyAuth, removeTag)
 
 module.exports = tagsRouter

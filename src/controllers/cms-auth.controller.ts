@@ -8,7 +8,7 @@ class CmsAuthController {
     ctx.success({ ...userInfo, token })
   }
 
-  async success(ctx: DefaultContext) {
+  async validated(ctx: DefaultContext) {
     ctx.success(ctx.user)
   }
 }

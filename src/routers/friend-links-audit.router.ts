@@ -1,10 +1,9 @@
 import KoaRouter from '@koa/router'
 import friendLinksAuditController from '../controllers/friend-links-audit.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
-import { verifyAdmin } from '../middlewares/friend-links.middleware'
 
 const friendLinksAuditRouter = new KoaRouter({ prefix: '/friend-links-audit' })
-const { create, audit, passedList } = friendLinksAuditController
+const { createFriendAudit, approveFriendAudit, getPassedFriendList } = friendLinksAuditController
 
 /**
  * @swagger
@@ -15,6 +14,18 @@ const { create, audit, passedList } = friendLinksAuditController
  *      scheme: bearer
  *      bearerFormat: JWT
  */
+
+/**
+ * @swagger
+ * /friend-links-audit/passed:
+ *  get:
+ *    tags: [FriendLinksAudit]
+ *    summary: 获取审批通过的列表
+ *    responses:
+ *      200:
+ *        description: success
+ */
+friendLinksAuditRouter.get('/passed', getPassedFriendList)
 
 /**
  * @swagger
@@ -45,13 +56,14 @@ const { create, audit, passedList } = friendLinksAuditController
  *      200:
  *        description: success
  */
-friendLinksAuditRouter.post('/', create)
+friendLinksAuditRouter.post('/', createFriendAudit)
+
 /**
  * @swagger
  * /friend-links-audit/audit:
  *  post:
  *    tags: [FriendLinksAudit]
- *    summary: 审核
+ *    summary: 审核友链申请
  *    security:
  *      - bearerAuth: []
  *    requestBody:
@@ -71,17 +83,6 @@ friendLinksAuditRouter.post('/', create)
  *      200:
  *        description: success
  */
-friendLinksAuditRouter.post('/audit', verifyAuth, verifyAdmin, audit)
-/**
- * @swagger
- * /friend-links-audit/passed:
- *  get:
- *    tags: [FriendLinksAudit]
- *    summary: 获取审批通过的列表
- *    responses:
- *      200:
- *        description: success
- */
-friendLinksAuditRouter.get('/passed', passedList)
+friendLinksAuditRouter.post('/audit', verifyAuth, approveFriendAudit)
 
 module.exports = friendLinksAuditRouter

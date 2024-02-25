@@ -2,16 +2,6 @@ import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 
 class PageviewsService {
-  async create(ipAddress: string, pageUrl: string) {
-    try {
-      const statement = `INSERT INTO pageviews (ip_address, page_url) VALUES (?, ?);`
-      const [res] = await connection.execute(statement, [ipAddress, pageUrl])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
   async getPvByPageUrl(pageUrl: string) {
     try {
       const statement = `SELECT COUNT(*) pvCount FROM pageviews WHERE page_url = ?;`
@@ -44,6 +34,16 @@ class PageviewsService {
       return res
     } catch (error) {
       console.log(error)
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createPv(ipAddress: string, pageUrl: string) {
+    try {
+      const statement = `INSERT INTO pageviews (ip_address, page_url) VALUES (?, ?);`
+      const [res] = await connection.execute(statement, [ipAddress, pageUrl])
+      return res
+    } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
   }

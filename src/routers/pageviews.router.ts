@@ -2,7 +2,37 @@ import KoaRouter from '@koa/router'
 import pageviewsController from '../controllers/pageviews.controller'
 
 const pageviewsRouter = new KoaRouter({ prefix: '/pageviews' })
-const { create, getPv, getUv } = pageviewsController
+const { createPv, getPv, getUv } = pageviewsController
+
+/**
+ * @swagger
+ * /pageviews/pv:
+ *  get:
+ *    tags: [Pageviews]
+ *    summary: 获取页面pv
+ *    parameters:
+ *      - in: query
+ *        name: pageUrl
+ *        schema:
+ *          type: string
+ *          example: /
+ *    responses:
+ *      200:
+ *        description: success
+ */
+pageviewsRouter.get('/pv', getPv)
+
+/**
+ * @swagger
+ * /pageviews/uv:
+ *  get:
+ *    tags: [Pageviews]
+ *    summary: 获取网站uv
+ *    responses:
+ *      200:
+ *        description: success
+ */
+pageviewsRouter.get('/uv', getUv)
 
 /**
  * @swagger
@@ -24,34 +54,6 @@ const { create, getPv, getUv } = pageviewsController
  *      200:
  *        description: success
  */
-pageviewsRouter.post('/', create)
-/**
- * @swagger
- * /pageviews/pv:
- *  get:
- *    tags: [Pageviews]
- *    summary: 获取页面pv
- *    parameters:
- *      - in: query
- *        name: pageUrl
- *        schema:
- *          type: string
- *          example: /
- *    responses:
- *      200:
- *        description: success
- */
-pageviewsRouter.get('/pv', getPv)
-/**
- * @swagger
- * /pageviews/uv:
- *  get:
- *    tags: [Pageviews]
- *    summary: 获取网站uv
- *    responses:
- *      200:
- *        description: success
- */
-pageviewsRouter.get('/uv', getUv)
+pageviewsRouter.post('/', createPv)
 
 module.exports = pageviewsRouter

@@ -4,35 +4,15 @@ import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 
 class CategoriesService {
-  async create(category: string) {
-    try {
-      const statement = `INSERT INTO categories (name) VALUES (?);`
-      const [res] = await connection.execute(statement, [category])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async hasCategory(category: string) {
-    try {
-      const statement = `SELECT * FROM categories WHERE name = ?;`
-      const [res] = (await connection.execute(statement, [category])) as RowDataPacket[]
-      return !!res[0]
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async getList() {
+  async getCategoryList() {
     try {
       const statement = `
-        SELECT *,
+        SELECT c.id, c.name, c.create_time createTime, c.update_time updateTime,
           (
             SELECT COUNT(*)
             FROM articles a
             WHERE c.id = a.category_id
-          ) article_count
+          ) articleCount
         FROM categories c;
       `
       const [res] = await connection.execute(statement)
@@ -42,25 +22,15 @@ class CategoriesService {
     }
   }
 
-  async remove(categoryId: number) {
-    try {
-      const statement = `DELETE FROM categories WHERE id = ?;`
-      const [res] = await connection.execute(statement, [categoryId])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
   async getCategoryById(categoryId: number) {
     try {
       const statement = `
-        SELECT *,
+        SELECT c.id, c.name, c.create_time createTime, c.update_time updateTime,
           (
             SELECT COUNT(*)
             FROM articles a
             WHERE c.id = a.category_id
-          ) article_count
+          ) articleCount
         FROM categories c
         WHERE c.id = ?;
       `
@@ -78,11 +48,11 @@ class CategoriesService {
               atc.title,
               atc.content,
               atc.description,
-              atc.cover_url,
-              atc.create_time,
-              atc.update_time,
-              atc.is_sticky,
-              JSON_OBJECT('id', u.id, 'name', u.name, 'avatar_url', u.avatar_url) AS author,
+              atc.cover_url coverUrl,
+              atc.create_time createTime,
+              atc.update_time updateTime,
+              atc.is_sticky isSticky,
+              JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
               JSON_OBJECT('id', c.id, 'name', c.name) AS category,
               NULLIF(
                   COALESCE(
@@ -103,6 +73,36 @@ class CategoriesService {
       `
       const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
       return sortArticles(res)
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createCategory(category: string) {
+    try {
+      const statement = `INSERT INTO categories (name) VALUES (?);`
+      const [res] = await connection.execute(statement, [category])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async removeCategory(categoryId: number) {
+    try {
+      const statement = `DELETE FROM categories WHERE id = ?;`
+      const [res] = await connection.execute(statement, [categoryId])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async hasCategory(category: string) {
+    try {
+      const statement = `SELECT * FROM categories WHERE name = ?;`
+      const [res] = (await connection.execute(statement, [category])) as RowDataPacket[]
+      return !!res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

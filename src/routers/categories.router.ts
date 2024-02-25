@@ -3,7 +3,7 @@ import categoriesController from '../controllers/categories.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const categoriesRouter = new KoaRouter({ prefix: '/categories' })
-const { create, list, remove, getCategoryById, getArticlesByCateId } = categoriesController
+const { createCategory, getCategoryList, removeCategory, getCategoryById, getArticlesByCateId } = categoriesController
 
 /**
  * @swagger
@@ -14,6 +14,54 @@ const { create, list, remove, getCategoryById, getArticlesByCateId } = categorie
  *      scheme: bearer
  *      bearerFormat: JWT
  */
+
+/**
+ * @swagger
+ * /categories:
+ *  get:
+ *    tags: [Categories]
+ *    summary: 获取分类列表
+ *    responses:
+ *      200:
+ *        description: 返回分类列表
+ */
+categoriesRouter.get('/', getCategoryList)
+
+/**
+ * @swagger
+ * /categories/{categoryId}/articles:
+ *  get:
+ *    tags: [Categories]
+ *    summary: 根据categoryId获取相关文章列表
+ *    parameters:
+ *      - in: path
+ *        name: categoryId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+categoriesRouter.get('/:categoryId/articles', getArticlesByCateId)
+
+/**
+ * @swagger
+ * /categories/{categoryId}:
+ *  get:
+ *    tags: [Categories]
+ *    summary: 根据id获取分类信息
+ *    parameters:
+ *      - in: path
+ *        name: categoryId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+categoriesRouter.get('/:categoryId', getCategoryById)
 
 /**
  * @swagger
@@ -37,18 +85,8 @@ const { create, list, remove, getCategoryById, getArticlesByCateId } = categorie
  *      200:
  *        description: 新建成功
  */
-categoriesRouter.post('/', verifyAuth, create)
-/**
- * @swagger
- * /categories:
- *  get:
- *    tags: [Categories]
- *    summary: 获取分类列表
- *    responses:
- *      200:
- *        description: 返回分类列表
- */
-categoriesRouter.get('/', list)
+categoriesRouter.post('/', verifyAuth, createCategory)
+
 /**
  * @swagger
  * /categories/{categoryId}:
@@ -66,40 +104,6 @@ categoriesRouter.get('/', list)
  *      200:
  *        description: success
  */
-categoriesRouter.delete('/:categoryId', verifyAuth, remove)
-/**
- * @swagger
- * /categories/{categoryId}:
- *  get:
- *    tags: [Categories]
- *    summary: 根据id获取分类信息
- *    parameters:
- *      - in: path
- *        name: categoryId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-categoriesRouter.get('/:categoryId', getCategoryById)
-/**
- * @swagger
- * /categories/{categoryId}/articles:
- *  get:
- *    tags: [Categories]
- *    summary: 根据categoryId获取相关文章列表
- *    parameters:
- *      - in: path
- *        name: categoryId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-categoriesRouter.get('/:categoryId/articles', getArticlesByCateId)
+categoriesRouter.delete('/:categoryId', verifyAuth, removeCategory)
 
 module.exports = categoriesRouter

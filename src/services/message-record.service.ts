@@ -1,12 +1,12 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
-import { TMsgState } from '../controllers/message-record.controller'
 
 // Types
-export type TMessageType = '0' | '1' | '2' | '3' | '4'
+type TMessageType = '0' | '1' | '2' | '3' | '4'
+type TMsgState = '0' | '1'
 
 class MessageRecordService {
-  async getList(userId: number, offset = 0, limit = 10) {
+  async getMsgListByUserId(userId: number, offset = 0, limit = 10) {
     try {
       const statement = `
         SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time createTime,
@@ -24,7 +24,7 @@ class MessageRecordService {
     }
   }
 
-  async getListByState(userId: number, state: TMsgState, offset = 0, limit = 10) {
+  async getMsgListByState(userId: number, state: TMsgState, offset = 0, limit = 10) {
     try {
       const statement = `
         SELECT mr.id, mr.message_type messageType, mr.content, mr.link_atc_id linkAtcId, mr.create_time createTime,
@@ -36,16 +36,6 @@ class MessageRecordService {
         LIMIT ?, ?
       `
       const [res] = await connection.execute(statement, [userId, state, offset, limit])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
-  async clearUnreadByUserId(userId: number) {
-    try {
-      const statement = `UPDATE message_record SET state = '1' WHERE target_user = ? AND state = '0';`
-      const [res] = await connection.execute(statement, [userId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -85,6 +75,16 @@ class MessageRecordService {
       return res
     } catch (error) {
       console.log(error)
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async clearUnreadByUserId(userId: number) {
+    try {
+      const statement = `UPDATE message_record SET state = '1' WHERE target_user = ? AND state = '0';`
+      const [res] = await connection.execute(statement, [userId])
+      return res
+    } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
   }

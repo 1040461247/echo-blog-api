@@ -13,13 +13,13 @@ interface IUsers {
   id?: number
   name: string
   password?: string
-  avatar_url?: string
-  browser_info?: string
-  os_info?: string
-  ip_address?: string
-  phone_num?: string
-  create_time?: string
-  update_time?: string
+  avatarUrl?: string
+  browserInfo?: string
+  osInfo?: string
+  ipAddress?: string
+  phoneNum?: string
+  createTime?: string
+  updatTime?: string
 }
 
 interface IArticles {

@@ -2,7 +2,7 @@ import KoaRouter from '@koa/router'
 import statisticsController from '../controllers/statistics.controller'
 
 const statisticsRouter = new KoaRouter({ prefix: '/statistics' })
-const { total } = statisticsController
+const { getStatisticsTotal } = statisticsController
 
 /**
  * @swagger
@@ -14,6 +14,6 @@ const { total } = statisticsController
  *      200:
  *        description: success
  */
-statisticsRouter.get('/', total)
+statisticsRouter.get('/', getStatisticsTotal)
 
 module.exports = statisticsRouter

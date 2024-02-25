@@ -9,9 +9,9 @@ interface ITotal {
 }
 
 class StatisticsController {
-  async total(ctx: DefaultContext) {
+  async getStatisticsTotal(ctx: DefaultContext) {
     const resourceList = ['articles', 'tags', 'categories']
-    const res = (await statisticsService.getTotal(resourceList)) as ITotal
+    const res = (await statisticsService.getStatisticsTotal(resourceList)) as ITotal
     ctx.success(res)
   }
 }

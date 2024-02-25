@@ -3,27 +3,27 @@ import { UAParser } from 'ua-parser-js'
 import IP2Region from 'ip2region'
 
 export interface IUserSystemInfo {
-  browser_info: string
-  os_info: string
-  ip_address: string
+  browserInfo: string
+  osInfo: string
+  ipAddress: string
 }
 
 export default function getUserSystemInfo(ctx: DefaultContext): IUserSystemInfo {
-  // Get browser_info And os_info
+  // Get browserInfo And osInfo
   const uaStr = ctx.headers['user-agent']
   const parser = new UAParser(uaStr)
   const browser = parser.getBrowser()
   const os = parser.getOS()
-  const browser_info = `${browser.name} ${browser.major}`
-  const os_info = `${os.name} ${os.version}`
+  const browserInfo = `${browser.name} ${browser.major}`
+  const osInfo = `${os.name} ${os.version}`
 
-  // Get ip_address
+  // Get ipAddress
   const ip = getReqIp(ctx)
   const query = new IP2Region()
   const ipRes = query.search(ip)!
-  const ip_address = ipRes?.province! || ipRes?.isp
+  const ipAddress = ipRes?.province! || ipRes?.isp
 
-  return { browser_info, os_info, ip_address }
+  return { browserInfo, osInfo, ipAddress }
 }
 
 export function getReqIp(ctx: DefaultContext) {

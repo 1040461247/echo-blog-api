@@ -11,15 +11,7 @@ class FileService {
       throw new Error(DATABASE_ERROR)
     }
   }
-  async updateAvatar(filename: string, mimetype: string, size: number, user_id: number) {
-    try {
-      const statement = `UPDATE file_avatar SET filename = ?, mimetype = ?, size = ? WHERE user_id = ?;`
-      const [res] = await connection.execute(statement, [filename, mimetype, size, user_id])
-      return res
-    } catch (error) {
-      throw new Error(DATABASE_ERROR)
-    }
-  }
+
   async createIllustration(filename: string, mimetype: string, size: number, article_id: number) {
     try {
       const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id) VALUES (?, ?, ?, ?);`
@@ -29,6 +21,7 @@ class FileService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
   async createCover(filename: string, mimetype: string, size: number, articleId: number) {
     try {
       const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id, is_cover) VALUES (?, ?, ?, ?, 1);`
@@ -38,6 +31,17 @@ class FileService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
+  async updateAvatar(filename: string, mimetype: string, size: number, user_id: number) {
+    try {
+      const statement = `UPDATE file_avatar SET filename = ?, mimetype = ?, size = ? WHERE user_id = ?;`
+      const [res] = await connection.execute(statement, [filename, mimetype, size, user_id])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
   async updateCover(filename: string, mimetype: string, size: number, articleId: number) {
     try {
       const statement = `
@@ -51,6 +55,7 @@ class FileService {
       throw new Error(DATABASE_ERROR)
     }
   }
+
   async removeCover(articleId: number) {
     try {
       const statement = `DELETE FROM file_illustration WHERE article_id = ? AND is_cover = 1;`
