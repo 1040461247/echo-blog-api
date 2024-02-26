@@ -7,7 +7,7 @@ import {
   verifyOtp,
   verifyPhone,
 } from '../middlewares/auth.middleware'
-import { updateUserSystemInfo } from '../middlewares/users.middleware'
+import { updateUserSystemInfo, updateUserLoginTime } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()
 const { loginByAccount, validated, sendedOtp, loginByPhone, logout } = authController
@@ -59,7 +59,7 @@ authRouter.get('/authorized', verifyAuth, updateUserSystemInfo, validated)
  *      200:
  *        description: 登录成功
  */
-authRouter.post('/login', verifyAccount, updateUserSystemInfo, loginByAccount)
+authRouter.post('/login', verifyAccount, updateUserSystemInfo, updateUserLoginTime, loginByAccount)
 
 /**
  * @swagger
@@ -84,7 +84,7 @@ authRouter.post('/login', verifyAccount, updateUserSystemInfo, loginByAccount)
  *      200:
  *        description: 发送成功
  */
-authRouter.post('/login-phone', verifyOtp, loginByPhone)
+authRouter.post('/login-phone', verifyOtp, updateUserLoginTime, loginByPhone)
 
 /**
  * @swagger

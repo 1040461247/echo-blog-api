@@ -9,7 +9,19 @@ class UserService {
   async getUserByName(name: string) {
     try {
       const statement = `
-        SELECT id, name, password, avatar_url avatarUrl, phone_num phoneNum, browser_info browserInfo, os_info osInfo, ip_address ipAddress, update_time updateTime, create_time createTime
+        SELECT
+          id,
+          name,
+          password,
+          avatar_url avatarUrl,
+          phone_num phoneNum,
+          motto,
+          browser_info browserInfo,
+          os_info osInfo,
+          ip_address ipAddress,
+          login_time loginTime,
+          update_time updateTime,
+          create_time createTime
         FROM users
         WHERE name = ?;`
       const [res] = await connection.execute(statement, [name])
@@ -22,7 +34,19 @@ class UserService {
   async getUserByPhone(phone: string) {
     try {
       const statement = `
-        SELECT id, name, password, avatar_url avatarUrl, phone_num phoneNum, browser_info browserInfo, os_info osInfo, ip_address ipAddress, update_time updateTime, create_time createTime
+        SELECT
+          id,
+          name,
+          password,
+          avatar_url avatarUrl,
+          phone_num phoneNum,
+          motto,
+          browser_info browserInfo,
+          os_info osInfo,
+          ip_address ipAddress,
+          login_time loginTime,
+          update_time updateTime,
+          create_time createTime
         FROM users
         WHERE phone_num = ?;
       `
@@ -36,7 +60,19 @@ class UserService {
   async getUserById(userId: number) {
     try {
       const statement = `
-        SELECT id, name, password, avatar_url avatarUrl, phone_num phoneNum, browser_info browserInfo, os_info osInfo, ip_address ipAddress, update_time updateTime, create_time createTime
+        SELECT
+          id,
+          name,
+          password,
+          avatar_url avatarUrl,
+          phone_num phoneNum,
+          motto,
+          browser_info browserInfo,
+          os_info osInfo,
+          ip_address ipAddress,
+          login_time loginTime,
+          update_time updateTime,
+          create_time createTime
         FROM users
         WHERE id = ?;
       `
@@ -50,7 +86,18 @@ class UserService {
   async getUserList() {
     try {
       const statement = `
-        SELECT id, name, avatar_url avatarUrl, create_time createTime, update_time updateTime
+        SELECT
+          id,
+          name,
+          avatar_url avatarUrl,
+          phone_num phoneNum,
+          motto,
+          browser_info browserInfo,
+          os_info osInfo,
+          ip_address ipAddress,
+          login_time loginTime,
+          update_time updateTime,
+          create_time createTime
         FROM users;
       `
       const [res] = await connection.execute(statement)
@@ -130,6 +177,17 @@ class UserService {
 
       const statement = `UPDATE users SET ${setState} WHERE id = ?;`
       const [res] = await connection.execute(statement, values)
+      return res
+    } catch (error) {
+      console.log(error)
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async updateUserLoginTime(loginTime: Date, userId: number) {
+    try {
+      const statement = `UPDATE users SET login_time = ? WHERE id = ?;`
+      const [res] = await connection.execute(statement, [loginTime, userId])
       return res
     } catch (error) {
       console.log(error)

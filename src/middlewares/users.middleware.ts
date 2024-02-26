@@ -52,4 +52,15 @@ const updateUserSystemInfo: Middleware = async (ctx, next) => {
   }
 }
 
-export { encrypPwd, updateUserSystemInfo, verifyRegisterInfo }
+const updateUserLoginTime: Middleware = async (ctx, next) => {
+  try {
+    const nowDate = new Date()
+    const userId = ctx.user?.id
+    await usersService.updateUserLoginTime(nowDate, userId!)
+    await next()
+  } catch (error: any) {
+    ctx.fail(error)
+  }
+}
+
+export { encrypPwd, updateUserSystemInfo, verifyRegisterInfo, updateUserLoginTime }
