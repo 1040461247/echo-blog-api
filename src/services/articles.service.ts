@@ -3,6 +3,7 @@ import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
+import { IArticles } from '../types'
 
 class ArticlesService {
   async getArticleList(offset = 0, limit = 10) {
@@ -75,7 +76,7 @@ class ArticlesService {
         GROUP BY atc.id, c.id;
       `
       const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
-      return sortArticles(res)
+      return sortArticles(res as IArticles[])
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
@@ -113,7 +114,7 @@ class ArticlesService {
         GROUP BY atc.id;
       `
       const [res] = (await connection.execute(statement, [tagId])) as RowDataPacket[][]
-      return sortArticles(res)
+      return sortArticles(res as IArticles[])
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }
