@@ -1,17 +1,8 @@
 import { type DefaultContext } from 'koa'
-import friendLinksAuditService, { TAuditState } from '../services/friend-links-audit.service'
+import friendLinksAuditService from '../services/friend-links-audit.service'
 import { OkPacketParams } from 'mysql2'
 
 class FriendLinksAuditController {
-  async getPassedFriendList(ctx: DefaultContext) {
-    try {
-      const passedList = await friendLinksAuditService.getPassedFriendList()
-      ctx.success(passedList)
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
   async createFriendAudit(ctx: DefaultContext) {
     try {
       const { linkName, linkUrl, linkIcon, linkDesc } = ctx.request.body
@@ -19,7 +10,7 @@ class FriendLinksAuditController {
         linkName,
         linkUrl,
         linkIcon,
-        linkDesc
+        linkDesc,
       )) as OkPacketParams
       ctx.success({ insertId: res.insertId })
     } catch (error: any) {

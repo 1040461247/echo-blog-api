@@ -67,11 +67,17 @@ class MessageRecordService {
     sendUser: number,
     targetUser: number,
     content: string,
-    linkAtcId: number
+    linkAtcId: number,
   ) {
     try {
       const statement = `INSERT INTO message_record (message_type, send_user, target_user, content, link_atc_id) VALUES (?, ?, ?, ?, ?)`
-      const [res] = await connection.execute(statement, [messageType, sendUser, targetUser, content, linkAtcId])
+      const [res] = await connection.execute(statement, [
+        messageType,
+        sendUser,
+        targetUser,
+        content,
+        linkAtcId,
+      ])
       return res
     } catch (error) {
       console.log(error)

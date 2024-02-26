@@ -5,14 +5,16 @@ import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
 
 const {
-  createArticle,
   getArticleList,
+  getArticleListByTagId,
+  getArticleListByCateId,
   getArticleById,
   getIllustration,
   getArticleCover,
-  removeArticleCover,
+  createArticle,
+  createTagsToAtc,
   updateAtcCategory,
-  createTagsToAtc
+  removeArticleCover,
 } = articlesController
 
 /**
@@ -47,6 +49,42 @@ const {
  *        description: 获取成功
  */
 articlesRouter.get('/', getArticleList)
+
+/**
+ * @swagger
+ * /articles/{categoryId}:
+ *  get:
+ *    tags: [Articles]
+ *    summary: 根据categoryId获取相关文章列表
+ *    parameters:
+ *      - in: path
+ *        name: categoryId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.get('/category/:categoryId', getArticleListByCateId)
+
+/**
+ * @swagger
+ * /articles/{tagId}:
+ *  get:
+ *    tags: [Articles]
+ *    summary: 根据tagId获取相关文章列表
+ *    parameters:
+ *      - in: path
+ *        name: tagId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.get('/tag/:tagId', getArticleListByTagId)
 
 /**
  * @swagger
@@ -199,7 +237,12 @@ articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles')
  *      200:
  *        description: success
  */
-articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('articles'), updateAtcCategory)
+articlesRouter.patch(
+  '/:articleId/category',
+  verifyAuth,
+  verifyPermission('articles'),
+  updateAtcCategory,
+)
 
 /**
  * @swagger
@@ -219,6 +262,11 @@ articlesRouter.patch('/:articleId/category', verifyAuth, verifyPermission('artic
  *      200:
  *        description: success
  */
-articlesRouter.delete('/:articleId/cover', verifyAuth, verifyPermission('articles'), removeArticleCover)
+articlesRouter.delete(
+  '/:articleId/cover',
+  verifyAuth,
+  verifyPermission('articles'),
+  removeArticleCover,
+)
 
 module.exports = articlesRouter

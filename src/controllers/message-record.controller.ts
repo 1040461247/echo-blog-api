@@ -19,8 +19,12 @@ class MessageRecordController {
   async getMsgTotal(ctx: DefaultContext) {
     try {
       const { userId } = ctx.params
-      const [unreadCount] = (await messageRecordService.getUnreadCountByUserId(userId!)) as RowDataPacket[]
-      const [allCount] = (await messageRecordService.getAllCountByUserId(userId!)) as RowDataPacket[]
+      const [unreadCount] = (await messageRecordService.getUnreadCountByUserId(
+        userId!,
+      )) as RowDataPacket[]
+      const [allCount] = (await messageRecordService.getAllCountByUserId(
+        userId!,
+      )) as RowDataPacket[]
       ctx.success({ ...unreadCount, ...allCount })
     } catch (error: any) {
       ctx.fail(error)
@@ -30,8 +34,12 @@ class MessageRecordController {
   async clearUnread(ctx: DefaultContext) {
     try {
       const userId = ctx.user?.id
-      const { affectedRows } = (await messageRecordService.clearUnreadByUserId(userId!)) as OkPacketParams
-      ctx.success(null, { msg: affectedRows === 0 ? `暂无未读消息` : `${affectedRows}条数据已更新` })
+      const { affectedRows } = (await messageRecordService.clearUnreadByUserId(
+        userId!,
+      )) as OkPacketParams
+      ctx.success(null, {
+        msg: affectedRows === 0 ? `暂无未读消息` : `${affectedRows}条数据已更新`,
+      })
     } catch (error: any) {
       ctx.fail(error)
     }

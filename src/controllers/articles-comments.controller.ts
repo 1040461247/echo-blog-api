@@ -7,7 +7,9 @@ class ArticlesCommentsController {
   async getCommentsByAtcId(ctx: DefaultContext) {
     try {
       const { articleId } = ctx.query
-      const queryRes = (await articlesCommentsService.getCommentsByAtcId(articleId)) as IArticlesComments[]
+      const queryRes = (await articlesCommentsService.getCommentsByAtcId(
+        articleId,
+      )) as IArticlesComments[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -17,7 +19,9 @@ class ArticlesCommentsController {
   async getLikesCountByCmtId(ctx: DefaultContext) {
     try {
       const { commentId } = ctx.params
-      const [queryRes] = (await articlesCommentsService.getLikesCountByCmtId(commentId)) as RowDataPacket[]
+      const [queryRes] = (await articlesCommentsService.getLikesCountByCmtId(
+        commentId,
+      )) as RowDataPacket[]
       ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
@@ -27,7 +31,9 @@ class ArticlesCommentsController {
   async getLikesByUserId(ctx: DefaultContext) {
     try {
       const { userId } = ctx.params
-      const [{ commentLikes }] = (await articlesCommentsService.getLikesByUserId(userId)) as RowDataPacket[]
+      const [{ commentLikes }] = (await articlesCommentsService.getLikesByUserId(
+        userId,
+      )) as RowDataPacket[]
       ctx.success(commentLikes)
     } catch (error: any) {
       ctx.fail(error)
@@ -37,7 +43,11 @@ class ArticlesCommentsController {
   async createComment(ctx: DefaultContext) {
     try {
       const { content, articleId, userId } = ctx.request.body as IArticlesComments
-      const insertRes = (await articlesCommentsService.createComment(content, articleId, userId)) as OkPacketParams
+      const insertRes = (await articlesCommentsService.createComment(
+        content,
+        articleId,
+        userId,
+      )) as OkPacketParams
       ctx.success({ inesrtId: insertRes.insertId }, {})
     } catch (error: any) {
       ctx.fail(error)
@@ -63,7 +73,7 @@ class ArticlesCommentsController {
         content,
         articleId,
         userId,
-        commentId!
+        commentId!,
       )) as OkPacketParams
       ctx.success({ inesrtId: insertRes.insertId }, {})
     } catch (error: any) {

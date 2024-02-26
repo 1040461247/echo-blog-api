@@ -4,7 +4,7 @@ import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
 import {
   recordMessageOfComment,
   recordMessageOfLikeComment,
-  recordMessageOfReply
+  recordMessageOfReply,
 } from '../middlewares/message-record.middleware'
 
 const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
@@ -17,7 +17,7 @@ const {
   createLikes,
   removeLikes,
   getLikesCountByCmtId,
-  getLikesByUserId
+  getLikesByUserId,
 } = articlesCommentsController
 
 /**
@@ -200,7 +200,12 @@ ArticlesCommentsRouter.post('/likes', verifyAuth, recordMessageOfLikeComment, cr
  *      200:
  *        description: 修改成功
  */
-ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articles_comments'), updateComment)
+ArticlesCommentsRouter.patch(
+  '/:commentId',
+  verifyAuth,
+  verifyPermission('articles_comments'),
+  updateComment,
+)
 
 /**
  * @swagger
@@ -218,7 +223,12 @@ ArticlesCommentsRouter.patch('/:commentId', verifyAuth, verifyPermission('articl
  *      200:
  *        description: 删除成功
  */
-ArticlesCommentsRouter.delete('/:commentId', verifyAuth, verifyPermission('articles_comments'), removeComment)
+ArticlesCommentsRouter.delete(
+  '/:commentId',
+  verifyAuth,
+  verifyPermission('articles_comments'),
+  removeComment,
+)
 
 /**
  * @swagger
@@ -240,7 +250,7 @@ ArticlesCommentsRouter.delete(
   '/likes/:commentId',
   verifyAuth,
   verifyPermission('comment_likes', 'comment_id'),
-  removeLikes
+  removeLikes,
 )
 
 module.exports = ArticlesCommentsRouter

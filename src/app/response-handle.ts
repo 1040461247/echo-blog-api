@@ -13,7 +13,7 @@ const responseHandle: Middleware = async function (ctx, next) {
     ctx.body = {
       code: option?.code ?? 200,
       msg: option?.msg ?? 'success',
-      data: data
+      data: data,
     }
   }
 

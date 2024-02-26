@@ -9,7 +9,7 @@ import {
   UNAUTHORIZATION,
   AUTHORIZATION_EXPIRES,
   USER_ALREADY_EXISTS,
-  USER_DOES_NOT_EXISTS
+  USER_DOES_NOT_EXISTS,
 } from '../config/error-types.config'
 
 const errorHandle = (err: Error, ctx: DefaultContext) => {
@@ -65,7 +65,7 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
   ctx.type = 'json'
   ctx.body = {
     code: Number(status),
-    msg: msg
+    msg: msg,
   }
 }
 

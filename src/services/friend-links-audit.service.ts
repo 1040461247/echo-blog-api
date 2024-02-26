@@ -5,21 +5,6 @@ import { DATABASE_ERROR } from '../config/error-types.config'
 export type TAuditState = '0' | '1'
 
 class FriendLinksAuditService {
-  async getPassedFriendList() {
-    try {
-      const statement = `
-        SELECT id, link_name linkName, link_url linkUrl, link_icon linkIcon, link_desc linkDesc
-        FROM friend_links_audit
-        WHERE audit_state = '1';
-      `
-      const [res] = await connection.execute(statement)
-      return res
-    } catch (error) {
-      console.log(error)
-      throw new Error(DATABASE_ERROR)
-    }
-  }
-
   async createFriendAudit(linkName: string, linkUrl: string, linkIcon: string, linkDesc: string) {
     try {
       const statement = `INSERT INTO friend_links_audit (link_name, link_url, link_icon, link_desc) VALUES (?, ?, ?, ?);`

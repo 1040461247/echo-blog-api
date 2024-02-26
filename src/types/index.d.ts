@@ -94,5 +94,5 @@ export {
   ITags,
   IFileAvatar,
   IFileIllustration,
-  IArticlesRefTags
+  IArticlesRefTags,
 }

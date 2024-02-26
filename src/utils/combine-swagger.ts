@@ -1,7 +1,6 @@
 import fs from 'fs'
 import path from 'path'
 import SwaggerParser from '@apidevtools/swagger-parser'
-import YAML from 'js-yaml'
 
 const combineSwaggerSpecs = async () => {
   try {
@@ -12,11 +11,13 @@ const combineSwaggerSpecs = async () => {
       const fileStats = fs.statSync(filePath)
 
       if (fileStats.isDirectory()) {
-        const moduleSwaggerConfig = await SwaggerParser.bundle(path.resolve(filePath, './swagger.yaml'))
+        const moduleSwaggerConfig = await SwaggerParser.bundle(
+          path.resolve(filePath, './swagger.yaml'),
+        )
 
         combinedSpec = {
           ...combinedSpec,
-          ...moduleSwaggerConfig
+          ...moduleSwaggerConfig,
         }
       }
     })

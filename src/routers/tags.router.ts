@@ -3,7 +3,7 @@ import tagsController from '../controllers/tags.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const tagsRouter = new KoaRouter({ prefix: '/tags' })
-const { createTag, getTagList, removeTag, getTagById, getArticlesByTagId } = tagsController
+const { createTag, getTagList, removeTag, getTagById } = tagsController
 
 /**
  * @swagger
@@ -44,24 +44,6 @@ tagsRouter.get('/', getTagList)
  *        description: success
  */
 tagsRouter.get('/:tagId', getTagById)
-
-/**
- * @swagger
- * /tags/{tagId}/articles:
- *  get:
- *    tags: [Tags]
- *    summary: 根据tagId获取相关文章列表
- *    parameters:
- *      - in: path
- *        name: tagId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-tagsRouter.get('/:tagId/articles', getArticlesByTagId)
 
 /**
  * @swagger

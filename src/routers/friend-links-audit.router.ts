@@ -3,7 +3,7 @@ import friendLinksAuditController from '../controllers/friend-links-audit.contro
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const friendLinksAuditRouter = new KoaRouter({ prefix: '/friend-links-audit' })
-const { createFriendAudit, approveFriendAudit, getPassedFriendList } = friendLinksAuditController
+const { createFriendAudit, approveFriendAudit } = friendLinksAuditController
 
 /**
  * @swagger
@@ -14,18 +14,6 @@ const { createFriendAudit, approveFriendAudit, getPassedFriendList } = friendLin
  *      scheme: bearer
  *      bearerFormat: JWT
  */
-
-/**
- * @swagger
- * /friend-links-audit/passed:
- *  get:
- *    tags: [FriendLinksAudit]
- *    summary: 获取审批通过的列表
- *    responses:
- *      200:
- *        description: success
- */
-friendLinksAuditRouter.get('/passed', getPassedFriendList)
 
 /**
  * @swagger

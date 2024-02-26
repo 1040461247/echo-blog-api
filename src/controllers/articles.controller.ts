@@ -26,6 +26,26 @@ class ArticlesController {
     }
   }
 
+  async getArticleListByCateId(ctx: DefaultContext) {
+    try {
+      const { categoryId } = ctx.params
+      const queryRes = await articlesService.getArticleListByCateId(categoryId)
+      ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getArticleListByTagId(ctx: DefaultContext) {
+    try {
+      const { tagId } = ctx.params
+      const queryRes = await articlesService.getArticleListByTagId(tagId)
+      ctx.success(queryRes)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
   async getArticleById(ctx: DefaultContext) {
     try {
       const { articleId } = ctx.params
@@ -40,7 +60,9 @@ class ArticlesController {
   async getIllustration(ctx: DefaultContext) {
     try {
       const { filename } = ctx.params
-      const queryRes = (await articlesService.getIllustrationByFilename(filename)) as IFileIllustration
+      const queryRes = (await articlesService.getIllustrationByFilename(
+        filename,
+      )) as IFileIllustration
 
       if (queryRes) {
         ctx.response.set('content-type', queryRes.mimetype)
@@ -67,7 +89,8 @@ class ArticlesController {
 
   async createArticle(ctx: DefaultContext) {
     try {
-      const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request.body as IArticles
+      const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request
+        .body as IArticles
       const { id } = ctx.user!
 
       const insertRes = (await articlesService.createArticle(
@@ -77,7 +100,7 @@ class ArticlesController {
         categoryId,
         coverUrl,
         isSticky,
-        description
+        description,
       )) as OkPacketParams
       ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
     } catch (error: any) {

@@ -1,6 +1,12 @@
 import KoaRouter from '@koa/router'
 import authController from '../controllers/auth.controller'
-import { sendOtp, verifyAccount, verifyAuth, verifyOtp, verifyPhone } from '../middlewares/auth.middleware'
+import {
+  sendOtp,
+  verifyAccount,
+  verifyAuth,
+  verifyOtp,
+  verifyPhone,
+} from '../middlewares/auth.middleware'
 import { updateUserSystemInfo } from '../middlewares/users.middleware'
 
 const authRouter = new KoaRouter()

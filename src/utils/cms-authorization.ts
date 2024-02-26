@@ -58,7 +58,7 @@ export async function remTokenFromWhiteListCms(id: string) {
 export async function signTokenCms(payload: ISalt, expiresIn?: number) {
   const token = jwt.sign(payload, PRIMARY_KEY, {
     expiresIn: expiresIn ?? TOKEN_EXPIRE_TIME,
-    algorithm: 'RS256'
+    algorithm: 'RS256',
   })
 
   await addTokenToWhiteListCms(token, String(payload.id))
@@ -70,7 +70,7 @@ export async function signTokenCms(payload: ISalt, expiresIn?: number) {
 export async function verifyTokenCms(token: string) {
   try {
     const user = jwt.verify(token, PUBLIC_KEY, {
-      algorithms: ['RS256']
+      algorithms: ['RS256'],
     }) as IUsers
 
     // 提取合法Token与请求Token比对

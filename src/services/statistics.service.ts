@@ -1,4 +1,3 @@
-import { RowDataPacket } from 'mysql2'
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 

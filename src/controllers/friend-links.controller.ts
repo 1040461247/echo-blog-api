@@ -2,8 +2,13 @@ import { type DefaultContext } from 'koa'
 import friendLinksService from '../services/friend-links.service'
 
 class FriendLinksController {
-  async create(ctx: DefaultContext) {
-    ctx.success('niubi')
+  async getPassedFriendList(ctx: DefaultContext) {
+    try {
+      const passedList = await friendLinksService.getPassedFriendList()
+      ctx.success(passedList)
+    } catch (error: any) {
+      ctx.fail(error)
+    }
   }
 }
 

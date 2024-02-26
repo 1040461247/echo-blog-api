@@ -18,10 +18,10 @@ app.use(
   koaSwagger({
     routePrefix: '/api',
     swaggerOptions: {
-      spec: swaggerSpec
+      spec: swaggerSpec,
     },
-    hideTopbar: true
-  })
+    hideTopbar: true,
+  }),
 )
 useRoutes(app)
 

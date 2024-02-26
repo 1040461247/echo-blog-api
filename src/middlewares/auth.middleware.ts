@@ -6,7 +6,7 @@ import {
   NO_PERMISSION,
   PASSWORD_ERROR,
   UNAUTHORIZATION,
-  USER_DOES_NOT_EXISTS
+  USER_DOES_NOT_EXISTS,
 } from '../config/error-types.config'
 import authService from '../services/auth.service'
 import userService from '../services/users.service'
@@ -68,7 +68,12 @@ const verifyPermission = (resourceName: TResources, filed?: string) => {
       let hasPermision: boolean
       if (filed) {
         // 联合主键，表中没有id字段时
-        hasPermision = await authService.hasPermissionRef(resourceName, resourceFiledId, userId, filed)
+        hasPermision = await authService.hasPermissionRef(
+          resourceName,
+          resourceFiledId,
+          userId,
+          filed,
+        )
       } else {
         // 非联合主键，表中有id字段时
         hasPermision = await authService.hasPermission(resourceName, resourceFiledId, userId)

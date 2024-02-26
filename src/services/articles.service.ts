@@ -2,23 +2,32 @@ import connection from '../app/database'
 import { APP_HOST, APP_PORT, APP_PROTOCOL } from '../config/env.config'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
+import sortArticles from '../utils/sort-articles'
 
 class ArticlesService {
   async getArticleList(offset = 0, limit = 10) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.description, atc.cover_url coverUrl, atc.create_time createTime, atc.update_time updateTime, atc.is_sticky isSticky,
+      SELECT
+        atc.id,
+        atc.title,
+        atc.content,
+        atc.description,
+        atc.cover_url coverUrl,
+        atc.create_time createTime,
+        atc.update_time updateTime,
+        atc.is_sticky isSticky,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
-          NULLIF(
-              COALESCE(
-                  JSON_ARRAYAGG(
-                      JSON_OBJECT('id', tags.id, 'name', tags.name)
-                  ),
-                  '[{"id": null, "name": null}]'
-              ),
-              '[{"id": null, "name": null}]'
-          ) AS tags
+        NULLIF(
+            COALESCE(
+                JSON_ARRAYAGG(
+                    JSON_OBJECT('id', tags.id, 'name', tags.name)
+                ),
+                '[{"id": null, "name": null}]'
+            ),
+            '[{"id": null, "name": null}]'
+        ) AS tags
       FROM articles atc
       LEFT JOIN users u ON u.id = atc.user_id
       LEFT JOIN categories c ON c.id = atc.category_id
@@ -34,12 +43,20 @@ class ArticlesService {
     }
   }
 
-  async getArticleById(articleId: number) {
+  async getArticleListByCateId(categoryId: number) {
     try {
       const statement = `
-      SELECT atc.id, atc.title, atc.content, atc.description, atc.cover_url coverUrl, atc.create_time createTime, atc.update_time updateTime, atc.is_sticky isSticky,
-        JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
-        JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+        SELECT
+          atc.id,
+          atc.title,
+          atc.content,
+          atc.description,
+          atc.cover_url coverUrl,
+          atc.create_time createTime,
+          atc.update_time updateTime,
+          atc.is_sticky isSticky,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
+          JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
               COALESCE(
                   JSON_ARRAYAGG(
@@ -49,6 +66,82 @@ class ArticlesService {
               ),
               '[{"id": null, "name": null}]'
           ) AS tags
+        FROM categories c
+        LEFT JOIN articles atc ON atc.category_id = c.id
+        LEFT JOIN users u ON u.id = atc.user_id
+        LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
+        LEFT JOIN tags ON tags.id = art.tag_id
+        WHERE c.id = ?
+        GROUP BY atc.id, c.id;
+      `
+      const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
+      return sortArticles(res)
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticleListByTagId(tagId: number) {
+    try {
+      const statement = `
+        SELECT
+          atc.id,
+          atc.title,
+          atc.content,
+          atc.description,
+          atc.cover_url coverUrl,
+          atc.create_time createTime,
+          atc.update_time updateTime,
+          atc.is_sticky isSticky,
+          JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
+          JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+          NULLIF(
+              COALESCE(
+                  JSON_ARRAYAGG(
+                      JSON_OBJECT('id', tags.id, 'name', tags.name)
+                  ),
+                  '[{"id": null, "name": null}]'
+              ),
+              '[{"id": null, "name": null}]'
+          ) AS tags
+        FROM articles_ref_tags art
+        LEFT JOIN articles atc ON atc.id = art.article_id
+        LEFT JOIN users u ON u.id = atc.user_id
+        LEFT JOIN categories c ON c.id = atc.category_id
+        LEFT JOIN tags ON tags.id = art.tag_id
+        WHERE art.tag_id = ?
+        GROUP BY atc.id;
+      `
+      const [res] = (await connection.execute(statement, [tagId])) as RowDataPacket[][]
+      return sortArticles(res)
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticleById(articleId: number) {
+    try {
+      const statement = `
+      SELECT
+        atc.id,
+        atc.title,
+        atc.content,
+        atc.description,
+        atc.cover_url coverUrl,
+        atc.create_time createTime,
+        atc.update_time updateTime,
+        atc.is_sticky isSticky,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
+        JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+        NULLIF(
+            COALESCE(
+                JSON_ARRAYAGG(
+                    JSON_OBJECT('id', tags.id, 'name', tags.name)
+                ),
+                '[{"id": null, "name": null}]'
+            ),
+            '[{"id": null, "name": null}]'
+        ) AS tags
       FROM articles atc
       LEFT JOIN users u ON u.id = atc.user_id
       LEFT JOIN categories c ON c.id = atc.category_id
@@ -91,7 +184,7 @@ class ArticlesService {
     categoryId: number,
     coverUrl = '',
     isSticky = 0,
-    description: string
+    description: string,
   ) {
     try {
       const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky, description) VALUES (?, ?, ?, ?, ?, ?, ?);`
@@ -102,7 +195,7 @@ class ArticlesService {
         coverUrl,
         categoryId,
         isSticky,
-        description
+        description,
       ])
       return res
     } catch (error) {

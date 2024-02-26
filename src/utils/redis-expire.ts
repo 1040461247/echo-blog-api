@@ -1,6 +1,11 @@
 import getRedisClient from '../app/redis'
 
-export default async function redisExpire(structure: 'hash' | 'set', key: string, field: string, expireTime: number) {
+export default async function redisExpire(
+  structure: 'hash' | 'set',
+  key: string,
+  field: string,
+  expireTime: number,
+) {
   setTimeout(async () => {
     const redisClient = await getRedisClient()
     switch (structure) {

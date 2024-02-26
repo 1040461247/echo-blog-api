@@ -75,7 +75,14 @@ class UserService {
       const { name, password, phoneNum } = userInfo
       const { browserInfo, osInfo, ipAddress } = systemInfo
       const statement = `INSERT INTO users (name, password, phone_num, browser_info, os_info, ip_address) VALUES (?, ?, ?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [name, password, phoneNum, browserInfo, osInfo, ipAddress])
+      const [res] = await connection.execute(statement, [
+        name,
+        password,
+        phoneNum,
+        browserInfo,
+        osInfo,
+        ipAddress,
+      ])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -97,7 +104,12 @@ class UserService {
     }
   }
 
-  async updateUserSystemInfo(userId: number, browserInfo: string, osInfo: string, ipAddress: string) {
+  async updateUserSystemInfo(
+    userId: number,
+    browserInfo: string,
+    osInfo: string,
+    ipAddress: string,
+  ) {
     try {
       const statement = `UPDATE users SET browser_info = ?, os_info = ?, ip_address = ? WHERE id = ?;`
       const [res] = await connection.execute(statement, [browserInfo, osInfo, ipAddress, userId])

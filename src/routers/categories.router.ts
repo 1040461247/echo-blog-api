@@ -3,7 +3,7 @@ import categoriesController from '../controllers/categories.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const categoriesRouter = new KoaRouter({ prefix: '/categories' })
-const { createCategory, getCategoryList, removeCategory, getCategoryById, getArticlesByCateId } = categoriesController
+const { createCategory, getCategoryList, removeCategory, getCategoryById } = categoriesController
 
 /**
  * @swagger
@@ -26,24 +26,6 @@ const { createCategory, getCategoryList, removeCategory, getCategoryById, getArt
  *        description: 返回分类列表
  */
 categoriesRouter.get('/', getCategoryList)
-
-/**
- * @swagger
- * /categories/{categoryId}/articles:
- *  get:
- *    tags: [Categories]
- *    summary: 根据categoryId获取相关文章列表
- *    parameters:
- *      - in: path
- *        name: categoryId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-categoriesRouter.get('/:categoryId/articles', getArticlesByCateId)
 
 /**
  * @swagger

@@ -12,7 +12,12 @@ class AuthService {
     }
   }
 
-  async hasPermissionRef(resourceName: string, resourceFiledId: number, userId: number, filed: string) {
+  async hasPermissionRef(
+    resourceName: string,
+    resourceFiledId: number,
+    userId: number,
+    filed: string,
+  ) {
     try {
       const statement = `SELECT ${filed} FROM ${resourceName} WHERE ${filed} = ? AND user_id = ?;`
       const [res] = await connection.execute(statement, [resourceFiledId, userId])

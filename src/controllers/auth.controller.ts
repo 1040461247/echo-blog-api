@@ -35,7 +35,11 @@ class AuthController {
         usersService.updateUserSystemInfo(userInfo.id, browserInfo, osInfo, ipAddress)
         const token = await signToken({ id: userInfo.id })
 
-        ctx.success({ status: 1, msg: '登录成功', user: { id: userInfo.id, name: userInfo.name, token: token } })
+        ctx.success({
+          status: 1,
+          msg: '登录成功',
+          user: { id: userInfo.id, name: userInfo.name, token: token },
+        })
       } else {
         // 将信息存储在redis中，等待用户注册，30分钟后过期
         const redisClient = await getRedisClient()

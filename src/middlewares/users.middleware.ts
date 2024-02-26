@@ -35,7 +35,8 @@ const verifyRegisterInfo: Middleware = async (ctx, next) => {
 const encrypPwd: Middleware = async (ctx, next) => {
   const { password } = ctx.request.body as IUsers
   if (password) {
-    ;(ctx.request.body as IUsers).password = md5Encryp(password!)
+    const body = ctx.request.body as IUsers
+    body.password = md5Encryp(password!)
   }
   await next()
 }

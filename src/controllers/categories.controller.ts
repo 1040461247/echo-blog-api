@@ -23,16 +23,6 @@ class CategoriesController {
     }
   }
 
-  async getArticlesByCateId(ctx: DefaultContext) {
-    try {
-      const { categoryId } = ctx.params
-      const queryRes = await categoriesService.getArticlesByCateId(categoryId)
-      ctx.success(queryRes)
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
   async createCategory(ctx: DefaultContext) {
     try {
       const { category } = ctx.request.body

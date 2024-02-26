@@ -1,6 +1,6 @@
 import tagsService from '../services/tags.service'
 import type { DefaultContext } from 'koa'
-import type { OkPacketParams, RowDataPacket } from 'mysql2'
+import type { OkPacketParams } from 'mysql2'
 import type { ITags } from '../types'
 
 class TagsController {
@@ -18,16 +18,6 @@ class TagsController {
       const { tagId } = ctx.params
       const queryRes = (await tagsService.getTagById(tagId)) as ITags[]
       ctx.success(queryRes[0])
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async getArticlesByTagId(ctx: DefaultContext) {
-    try {
-      const { tagId } = ctx.params
-      const queryRes = (await tagsService.getArticlesByTagId(tagId)) as RowDataPacket[]
-      ctx.success(queryRes)
     } catch (error: any) {
       ctx.fail(error)
     }
