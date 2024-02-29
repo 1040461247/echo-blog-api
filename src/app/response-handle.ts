@@ -5,6 +5,7 @@ export interface ISuccessOption {
   msg?: string
   type?: string
   code?: number
+  total?: number
 }
 
 const responseHandle: Middleware = async function (ctx, next) {
@@ -14,6 +15,8 @@ const responseHandle: Middleware = async function (ctx, next) {
       code: option?.code ?? 200,
       msg: option?.msg ?? 'success',
       data: data,
+      success: true,
+      total: option?.total,
     }
   }
 

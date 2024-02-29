@@ -6,15 +6,54 @@ import sortArticles from '../utils/sort-articles'
 import { IArticles } from '../types'
 
 class ArticlesService {
-  async getArticleList(offset = 0, limit = 10) {
+  async getArticleList(offset = '0', limit = '1') {
     try {
       const statement = `
       SELECT
         atc.id,
         atc.title,
-        atc.content,
         atc.description,
         atc.cover_url coverUrl,
+        atc.create_time createTime,
+        atc.update_time updateTime,
+        atc.is_sticky isSticky,
+        JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
+        JSON_OBJECT('id', c.id, 'name', c.name) AS category,
+        NULLIF(
+            COALESCE(
+                JSON_ARRAYAGG(
+                    JSON_OBJECT('id', tags.id, 'name', tags.name)
+                ),
+                '[{"id": null, "name": null}]'
+            ),
+            '[{"id": null, "name": null}]'
+        ) AS tags
+      FROM articles atc
+      LEFT JOIN users u ON u.id = atc.user_id
+      LEFT JOIN categories c ON c.id = atc.category_id
+      LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
+      LEFT JOIN tags ON tags.id = art.tag_id
+      WHERE state = '1' AND visibility = '1'
+      GROUP BY atc.id
+      LIMIT ?, ?;
+    `
+      const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticleListAllStatus(offset = '0', limit = '10') {
+    try {
+      const statement = `
+      SELECT
+        atc.id,
+        atc.title,
+        atc.description,
+        atc.cover_url coverUrl,
+        atc.state,
+        atc.visibility,
         atc.create_time createTime,
         atc.update_time updateTime,
         atc.is_sticky isSticky,
@@ -40,6 +79,7 @@ class ArticlesService {
       const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
       return res
     } catch (error) {
+      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }
@@ -50,7 +90,6 @@ class ArticlesService {
         SELECT
           atc.id,
           atc.title,
-          atc.content,
           atc.description,
           atc.cover_url coverUrl,
           atc.create_time createTime,
@@ -88,7 +127,6 @@ class ArticlesService {
         SELECT
           atc.id,
           atc.title,
-          atc.content,
           atc.description,
           atc.cover_url coverUrl,
           atc.create_time createTime,
@@ -173,6 +211,16 @@ class ArticlesService {
       const statement = `SELECT * FROM file_illustration WHERE article_id = ? AND is_cover = 1;`
       const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
       return res[0]
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async getArticlesTotal() {
+    try {
+      const statement = `SELECT COUNT(*) articlesTotal FROM articles;`
+      const [res] = (await connection.execute(statement)) as any
+      return res[0].articlesTotal
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

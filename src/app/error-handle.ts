@@ -66,6 +66,7 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
   ctx.body = {
     code: Number(status),
     msg: msg,
+    success: false,
   }
 }
 
