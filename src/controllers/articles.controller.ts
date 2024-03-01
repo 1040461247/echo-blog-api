@@ -26,12 +26,11 @@ class ArticlesController {
     }
   }
 
-  async getArticleListAllStatus(ctx: DefaultContext) {
+  async getArticleListQuery(ctx: DefaultContext) {
     try {
-      const { offset, limit } = ctx.query
-      const queryRes = (await articlesService.getArticleListAllStatus(offset, limit)) as any[]
+      const queryRes = (await articlesService.getArticleListQuery(ctx.query)) as any[]
       const articleList = mapTagsToJson(queryRes)
-      const articlesTotal = await articlesService.getArticlesTotal()
+      const articlesTotal = await articlesService.getArticlesTotal(ctx.query)
       ctx.success(articleList, { total: articlesTotal })
     } catch (error: any) {
       ctx.fail(error)

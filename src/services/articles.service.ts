@@ -4,6 +4,31 @@ import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 import { IArticles } from '../types'
+import { opsToSortQuery, opsToWhereQuery } from '../utils/gen-query'
+import { pageToOffset } from '../utils/page-to-offset'
+
+// Types
+export type TArticleState = '0' | '1'
+export type TArticleVisibility = '0' | '1'
+export type TArticleIsSticky = '0' | '1'
+interface IDateRange {
+  startTime: string
+  endTime: string
+}
+
+export interface IArticleListQueryOption {
+  current: string
+  pageSize: string
+  title?: string
+  category?: string
+  'tags[]'?: string[]
+  state?: TArticleState
+  visibility?: TArticleVisibility
+  isSticky?: TArticleIsSticky
+  createTime?: IDateRange
+  endTime?: IDateRange
+  sort?: string
+}
 
 class ArticlesService {
   async getArticleList(offset = '0', limit = '1') {
@@ -44,8 +69,13 @@ class ArticlesService {
     }
   }
 
-  async getArticleListAllStatus(offset = '0', limit = '10') {
+  async getArticleListQuery(queryOption: IArticleListQueryOption) {
     try {
+      // 动态生成查询语句
+      const { offset, limit } = pageToOffset(queryOption.current, queryOption.pageSize)
+      const { whereQuery, whereVals } = opsToWhereQuery(queryOption, 'atc')
+      const sortQuery = opsToSortQuery(queryOption.sort, 'atc')
+
       const statement = `
       SELECT
         atc.id,
@@ -73,10 +103,16 @@ class ArticlesService {
       LEFT JOIN categories c ON c.id = atc.category_id
       LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
       LEFT JOIN tags ON tags.id = art.tag_id
+      ${whereQuery ? whereQuery : ''}
       GROUP BY atc.id
+      ${sortQuery ? sortQuery : ''}
       LIMIT ?, ?;
     `
-      const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
+      const [res] = (await connection.execute(statement, [
+        ...whereVals,
+        offset,
+        limit,
+      ])) as RowDataPacket[][]
       return res
     } catch (error) {
       console.log(error)
@@ -216,10 +252,14 @@ class ArticlesService {
     }
   }
 
-  async getArticlesTotal() {
+  async getArticlesTotal(queryOption: IArticleListQueryOption) {
     try {
-      const statement = `SELECT COUNT(*) articlesTotal FROM articles;`
-      const [res] = (await connection.execute(statement)) as any
+      const { whereQuery, whereVals } = opsToWhereQuery(queryOption, 'articles')
+
+      const statement = `SELECT COUNT(*) articlesTotal FROM articles ${
+        whereQuery ? whereQuery : ''
+      };`
+      const [res] = (await connection.execute(statement, whereVals)) as any
       return res[0].articlesTotal
     } catch (error) {
       throw new Error(DATABASE_ERROR)

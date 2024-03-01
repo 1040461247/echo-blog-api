@@ -6,7 +6,7 @@ const articlesRouter = new KoaRouter({ prefix: '/articles' })
 
 const {
   getArticleList,
-  getArticleListAllStatus,
+  getArticleListQuery,
   getArticleListByTagId,
   getArticleListByCateId,
   getArticleById,
@@ -59,12 +59,12 @@ articlesRouter.get('/', getArticleList)
  *    summary: 获取所有状态的文章列表
  *    parameters:
  *      - in: query
- *        name: offset
+ *        name: current
  *        schema:
  *          type: integer
- *          example: 0
+ *          example: 1
  *      - in: query
- *        name: limit
+ *        name: pageSize
  *        schema:
  *          type: integer
  *          example: 10
@@ -72,7 +72,7 @@ articlesRouter.get('/', getArticleList)
  *      200:
  *        description: 获取成功
  */
-articlesRouter.get('/all-status', getArticleListAllStatus)
+articlesRouter.get('/query', getArticleListQuery)
 
 /**
  * @swagger
