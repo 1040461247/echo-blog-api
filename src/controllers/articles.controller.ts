@@ -136,11 +136,15 @@ class ArticlesController {
     }
   }
 
-  async updateAtcCategory(ctx: DefaultContext) {
+  async updateArticleById(ctx: DefaultContext) {
     try {
       const { articleId } = ctx.params
-      const { categoryId } = ctx.request.body
-      await articlesService.updateAtcCategory(articleId, categoryId)
+      const modifiedData = ctx.request.body
+      if (Object.keys(modifiedData).length === 0) {
+        return ctx.fail(new Error('请指定需要更新的参数'))
+      }
+
+      await articlesService.updateArticleById(articleId, modifiedData)
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

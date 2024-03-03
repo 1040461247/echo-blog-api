@@ -1,6 +1,6 @@
 import camelToUnderscore from './camel-to-underscore'
 
-export function opsToWhereQuery(option: any, mainTable: string) {
+export function optToWhereQuery(option: any, mainTable: string) {
   const conditionArr: string[] = []
   const whereVals: any[] = []
 
@@ -55,7 +55,7 @@ export function opsToWhereQuery(option: any, mainTable: string) {
   return { whereQuery, whereVals }
 }
 
-export function opsToSortQuery(sortStr: string | undefined, mainTable: string) {
+export function optToSortQuery(sortStr: string | undefined, mainTable: string) {
   if (!sortStr) return null
   const sortArr: string[] = []
   const sortObj = JSON.parse(sortStr)
@@ -71,4 +71,18 @@ export function opsToSortQuery(sortStr: string | undefined, mainTable: string) {
   sortQuery = 'ORDER BY ' + sortQuery
 
   return sortQuery
+}
+
+export function optToUpdateQuery(option: any) {
+  const updateArr: string[] = []
+  const updateVals: any[] = []
+  const optKeys = Object.keys(option)
+
+  for (const key of optKeys) {
+    updateVals.push(option[key])
+    updateArr.push(`${camelToUnderscore(key)} = ?`)
+  }
+  const updateQuery = updateArr.join(', ')
+
+  return { updateQuery, updateVals }
 }

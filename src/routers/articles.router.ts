@@ -1,6 +1,7 @@
 import KoaRouter from '@koa/router'
 import articlesController from '../controllers/articles.controller'
 import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
+import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
 
@@ -14,7 +15,7 @@ const {
   getArticleCover,
   createArticle,
   createTagsToAtc,
-  updateAtcCategory,
+  updateArticleById,
   removeArticleCover,
 } = articlesController
 
@@ -236,10 +237,10 @@ articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles')
 
 /**
  * @swagger
- * /articles/{articleId}/category:
+ * /articles/{articleId}:
  *  patch:
  *    tags: [Articles]
- *    summary: 修改文章分类
+ *    summary: 更新文章
  *    security:
  *      - bearerAuth: []
  *    parameters:
@@ -254,19 +255,32 @@ articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles')
  *          schema:
  *            type: object
  *            properties:
+ *              title:
+ *                type: string
+ *                example: JavaScript高级程序设计
+ *              content:
+ *                type: string
+ *                example: content example
+ *              description:
+ *                type: string
+ *                example: description example
  *              categoryId:
- *                type: number
+ *                type: string
  *                example: 1
+ *              isSticky:
+ *                type: string
+ *                example: '0'
+ *              state:
+ *                type: string
+ *                example: '0'
+ *              visibility:
+ *                type: string
+ *                example: '0'
  *    responses:
  *      200:
  *        description: success
  */
-articlesRouter.patch(
-  '/:articleId/category',
-  verifyAuth,
-  verifyPermission('articles'),
-  updateAtcCategory,
-)
+articlesRouter.patch('/:articleId', verifyAuthCms, verifyPermission('articles'), updateArticleById)
 
 /**
  * @swagger

@@ -4,7 +4,7 @@ import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 import { IArticles } from '../types'
-import { opsToSortQuery, opsToWhereQuery } from '../utils/gen-query'
+import { optToSortQuery, optToUpdateQuery, optToWhereQuery } from '../utils/gen-query'
 import { pageToOffset } from '../utils/page-to-offset'
 
 // Types
@@ -28,6 +28,16 @@ export interface IArticleListQueryOption {
   createTime?: IDateRange
   endTime?: IDateRange
   sort?: string
+}
+
+export interface IModifiedOption {
+  title?: string
+  content?: string
+  description?: string
+  categoryId?: number
+  isSticky?: TArticleIsSticky
+  state?: TArticleState
+  visibility?: TArticleVisibility
 }
 
 class ArticlesService {
@@ -73,8 +83,8 @@ class ArticlesService {
     try {
       // 动态生成查询语句
       const { offset, limit } = pageToOffset(queryOption.current, queryOption.pageSize)
-      const { whereQuery, whereVals } = opsToWhereQuery(queryOption, 'atc')
-      const sortQuery = opsToSortQuery(queryOption.sort, 'atc')
+      const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'atc')
+      const sortQuery = optToSortQuery(queryOption.sort, 'atc')
 
       const statement = `
       SELECT
@@ -254,7 +264,7 @@ class ArticlesService {
 
   async getArticlesTotal(queryOption: IArticleListQueryOption) {
     try {
-      const { whereQuery, whereVals } = opsToWhereQuery(queryOption, 'articles')
+      const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'articles')
 
       const statement = `SELECT COUNT(*) articlesTotal FROM articles ${
         whereQuery ? whereQuery : ''
@@ -317,14 +327,16 @@ class ArticlesService {
     }
   }
 
-  async updateAtcCategory(articleId: number, categoryId: number) {
+  async updateArticleById(articleId: number, modifiedOpt: IModifiedOption) {
+    const { updateQuery, updateVals } = optToUpdateQuery(modifiedOpt)
+
     try {
       const statement = `
         UPDATE articles
-        SET category_id = ?
+        SET ${updateQuery}
         WHERE id = ?;
       `
-      const [res] = await connection.execute(statement, [categoryId, articleId])
+      const [res] = await connection.execute(statement, [...updateVals, articleId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
