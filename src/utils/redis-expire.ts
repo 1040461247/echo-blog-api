@@ -17,5 +17,5 @@ export default async function redisExpire(
         break
     }
     redisClient.quit()
-  }, expireTime * 1000)
+  }, expireTime)
 }

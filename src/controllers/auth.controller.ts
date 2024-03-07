@@ -35,6 +35,10 @@ class AuthController {
         usersService.updateUserSystemInfo(userInfo.id, browserInfo, osInfo, ipAddress)
         const token = await signToken({ id: userInfo.id })
 
+        // 更新用户登录信息
+        const nowDate = new Date()
+        await usersService.updateUserLoginTime(nowDate, userInfo.id)
+
         ctx.success({
           status: 1,
           msg: '登录成功',

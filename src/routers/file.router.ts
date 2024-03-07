@@ -2,6 +2,7 @@ import KoaRouter from '@koa/router'
 import fileController from '../controllers/file.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
 import { avatarHandler, illustrationHandler, coverHandler } from '../middlewares/file.middleware'
+import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const fileRouter = new KoaRouter({ prefix: '/upload' })
 const { createAvatar, createIllustration, createCover } = fileController
@@ -100,6 +101,6 @@ fileRouter.post('/illustration', verifyAuth, illustrationHandler, createIllustra
  *      200:
  *        description: success
  */
-fileRouter.post('/:articleId/cover', verifyAuth, coverHandler, createCover)
+fileRouter.post('/:articleId/cover', verifyAuthCms, coverHandler, createCover)
 
 module.exports = fileRouter

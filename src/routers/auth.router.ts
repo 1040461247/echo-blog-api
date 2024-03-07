@@ -84,7 +84,7 @@ authRouter.post('/login', verifyAccount, updateUserSystemInfo, updateUserLoginTi
  *      200:
  *        description: 发送成功
  */
-authRouter.post('/login-phone', verifyOtp, updateUserLoginTime, loginByPhone)
+authRouter.post('/login-phone', verifyOtp, loginByPhone)
 
 /**
  * @swagger

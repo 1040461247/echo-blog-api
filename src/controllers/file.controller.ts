@@ -11,6 +11,7 @@ import usersService from '../services/users.service'
 class FileController {
   async createAvatar(ctx: DefaultContext) {
     try {
+      console.log(ctx.req.body)
       const { filename, mimetype, size } = ctx.req.file
       const { id } = ctx.user!
 
@@ -64,7 +65,7 @@ class FileController {
         // 封面已存在，删除源文件并更新
         await fs.unlink(`${ILLUSTRATION_PATH}/${articleCover.filename}`)
         await fileService.updateCover(filename, mimetype, size, articleId)
-        ctx.success()
+        ctx.success(null, { msg: '文章封面已更新' })
       } else {
         // 新增封面
         const insertRes = (await fileService.createCover(
@@ -74,7 +75,7 @@ class FileController {
           articleId,
         )) as OkPacketParams
         await articlesService.updateArticleCover(articleId)
-        ctx.success({ insertId: insertRes.insertId })
+        ctx.success({ insertId: insertRes.insertId }, { msg: '文章封面上传成功' })
       }
     } catch (error: any) {
       ctx.fail(error)

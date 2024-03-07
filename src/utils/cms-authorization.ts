@@ -16,7 +16,7 @@ const TOKEN_EXPIRE_TIME = 24 * 60 * 60
 export async function addTokenToWhiteListCms(token: string, id: string) {
   const redisClient = await getRedisClient()
   await redisClient.hSet(CMS_TOKEN_HASH, id, token)
-  redisExpire('hash', CMS_TOKEN_HASH, id, TOKEN_EXPIRE_TIME)
+  redisExpire('hash', CMS_TOKEN_HASH, id, TOKEN_EXPIRE_TIME * 1000)
   redisClient.quit()
 }
 
