@@ -4,13 +4,30 @@ import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 import { IArticles } from '../types'
-import { optToSortQuery, optToUpdateQuery, optToWhereQuery } from '../utils/gen-query'
+import {
+  optToInsertQuery,
+  optToSortQuery,
+  optToUpdateQuery,
+  optToWhereQuery,
+} from '../utils/gen-query'
 import { pageToOffset } from '../utils/page-to-offset'
 
 // Types
-export type TArticleState = '0' | '1'
-export type TArticleVisibility = '0' | '1'
-export type TArticleIsSticky = '0' | '1'
+export enum EArticleState {
+  UNPUBLISHED = '0',
+  PUBLISHED = '1',
+}
+
+export enum EArticleIsSticky {
+  FALSE = '0',
+  TRUE = '1',
+}
+
+export enum EArticleVisibility {
+  NOT_VISIBLE = '0',
+  VISIBLE = '1',
+}
+
 interface IDateRange {
   startTime: string
   endTime: string
@@ -22,9 +39,9 @@ export interface IArticleListQueryOption {
   title?: string
   category?: string
   'tags[]'?: string[]
-  state?: TArticleState
-  visibility?: TArticleVisibility
-  isSticky?: TArticleIsSticky
+  state?: EArticleState
+  visibility?: EArticleVisibility
+  isSticky?: EArticleIsSticky
   createTime?: IDateRange
   endTime?: IDateRange
   sort?: string
@@ -35,9 +52,20 @@ export interface IModifiedOption {
   content?: string
   description?: string
   categoryId?: number
-  isSticky?: TArticleIsSticky
-  state?: TArticleState
-  visibility?: TArticleVisibility
+  isSticky?: EArticleIsSticky
+  state?: EArticleState
+  visibility?: EArticleVisibility
+}
+
+export interface ICreateArticleParams {
+  title: string
+  content: string
+  description?: string
+  categoryId: number
+  isSticky?: EArticleIsSticky
+  state?: EArticleState
+  visibility?: EArticleVisibility
+  userId: number
 }
 
 class ArticlesService {
@@ -92,11 +120,11 @@ class ArticlesService {
         atc.title,
         atc.description,
         atc.cover_url coverUrl,
-        atc.state,
-        atc.visibility,
         atc.create_time createTime,
         atc.update_time updateTime,
         atc.is_sticky isSticky,
+        atc.state,
+        atc.visibility,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
         NULLIF(
@@ -141,6 +169,8 @@ class ArticlesService {
           atc.create_time createTime,
           atc.update_time updateTime,
           atc.is_sticky isSticky,
+          atc.state,
+          atc.visibility,
           JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
           JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
@@ -178,6 +208,8 @@ class ArticlesService {
           atc.create_time createTime,
           atc.update_time updateTime,
           atc.is_sticky isSticky,
+          atc.state,
+          atc.visibility,
           JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
           JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
@@ -216,6 +248,8 @@ class ArticlesService {
         atc.create_time createTime,
         atc.update_time updateTime,
         atc.is_sticky isSticky,
+        atc.state,
+        atc.visibility,
         JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
         JSON_OBJECT('id', c.id, 'name', c.name) AS category,
         NULLIF(
@@ -276,36 +310,32 @@ class ArticlesService {
     }
   }
 
-  async createArticle(
-    title: string,
-    content: string,
-    userId: number,
-    categoryId: number,
-    coverUrl = '',
-    isSticky = 0,
-    description: string,
-  ) {
+  async createArticle(insertOption: ICreateArticleParams) {
+    const { insertQuery, insertVals } = optToInsertQuery(insertOption)
+    const valPlaceholder = insertVals.map(() => '?').join(', ')
+
     try {
-      const statement = `INSERT INTO articles (title, content, user_id, cover_url, category_id, is_sticky, description) VALUES (?, ?, ?, ?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [
-        title,
-        content,
-        userId,
-        coverUrl,
-        categoryId,
-        isSticky,
-        description,
-      ])
+      const statement = `INSERT INTO articles (${insertQuery}) VALUES (${valPlaceholder});`
+      const [res] = await connection.execute(statement, insertVals)
       return res
     } catch (error) {
+      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }
 
-  async createTagToAtc(articleId: number, tagId: number) {
+  async createTagsToAtc(articleId: number, tagIds: number[]) {
+    const insertVals: number[] = []
+    const valPlaceHolder = tagIds
+      .map((item) => {
+        insertVals.push(articleId, item)
+        return '(?, ?)'
+      })
+      .join(', ')
+
     try {
-      const statement = `INSERT INTO articles_ref_tags (article_id, tag_id) VALUES(?, ?);`
-      const [res] = await connection.execute(statement, [articleId, tagId])
+      const statement = `INSERT IGNORE INTO articles_ref_tags (article_id, tag_id) VALUES ${valPlaceHolder};`
+      const [res] = await connection.execute(statement, insertVals)
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -339,6 +369,7 @@ class ArticlesService {
       const [res] = await connection.execute(statement, [...updateVals, articleId])
       return res
     } catch (error) {
+      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }

@@ -13,8 +13,9 @@ const {
   getArticleById,
   getIllustration,
   getArticleCover,
-  createArticle,
-  createTagsToAtc,
+  // createArticle,
+  saveArticle,
+  // createTagsToAtc,
   updateArticleById,
   removeArticleCover,
 } = articlesController
@@ -203,7 +204,56 @@ articlesRouter.get('/:articleId/cover', getArticleCover)
  *      200:
  *        description: 新建成功
  */
-articlesRouter.post('/', verifyAuth, createArticle)
+// articlesRouter.post('/', verifyAuth, createArticle)
+
+/**
+ * @swagger
+ * /articles/save:
+ *  post:
+ *    tags: [Articles]
+ *    summary: 保存编辑中的文章
+ *    security:
+ *      - bearerAuth: []
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              id:
+ *                type: number
+ *                example: 1
+ *              title:
+ *                type: string
+ *                example: JavaScript从入门到放弃
+ *              content:
+ *                type: string
+ *                example: hello world
+ *              description:
+ *                type: string
+ *                example: article`s descripbe
+ *              categoryId:
+ *                type: number
+ *                example: 1
+ *              tags:
+ *                type: array
+ *                items:
+ *                  type: number
+ *              isSticky:
+ *                type: number
+ *                example: 0
+ *              state:
+ *                type: number
+ *                example: 0
+ *              visibility:
+ *                type: number
+ *                example: 0
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.post('/save', verifyAuthCms, saveArticle)
 
 /**
  * @swagger
@@ -233,7 +283,7 @@ articlesRouter.post('/', verifyAuth, createArticle)
  *      200:
  *        description: success
  */
-articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTagsToAtc)
+// articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTagsToAtc)
 
 /**
  * @swagger

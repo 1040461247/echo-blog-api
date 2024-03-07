@@ -1,10 +1,14 @@
 import fs from 'fs'
-import articlesService from '../services/articles.service'
+import articlesService, {
+  EArticleIsSticky,
+  ICreateArticleParams,
+} from '../services/articles.service'
 import fileService from '../services/file.service'
 import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
-import type { IArticles, IFileIllustration } from '../types'
+import type { IFileIllustration } from '../types'
+import objectFilter from '../utils/object-filter'
 
 function mapTagsToJson(queryRes: any) {
   return queryRes.map((item: any) => {
@@ -98,43 +102,79 @@ class ArticlesController {
     }
   }
 
-  async createArticle(ctx: DefaultContext) {
+  // async createArticle(ctx: DefaultContext) {
+  //   try {
+  //     const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request
+  //       .body as IArticles
+  //     const { id } = ctx.user!
+
+  //     const insertRes = (await articlesService.createArticle(
+  //       title,
+  //       content,
+  //       id!,
+  //       categoryId,
+  //       coverUrl,
+  //       isSticky,
+  //       description,
+  //     )) as OkPacketParams
+  //     ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
+  //   } catch (error: any) {
+  //     ctx.fail(error)
+  //   }
+  // }
+
+  async saveArticle(ctx: DefaultContext) {
     try {
-      const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request
-        .body as IArticles
-      const { id } = ctx.user!
+      const { id: articleId, tags } = ctx.request.body
+      const { id: userId } = ctx.user!
+      const createArticleOpt = objectFilter({ ...ctx.request.body, userId }, ['id', 'tags'])
 
-      const insertRes = (await articlesService.createArticle(
-        title,
-        content,
-        id!,
-        categoryId,
-        coverUrl,
-        isSticky,
-        description,
-      )) as OkPacketParams
-      ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async createTagsToAtc(ctx: DefaultContext) {
-    try {
-      const { articleId } = ctx.params
-      const { tagIds } = ctx.request.body
-      const promiseList = []
-
-      await articlesService.clearTags(articleId)
-      for (const tagId of tagIds) {
-        promiseList.push(articlesService.createTagToAtc(articleId, tagId))
+      // 校验isSticky类型，为boolean值时转为枚举类型
+      if (typeof createArticleOpt.isSticky === 'boolean') {
+        createArticleOpt.isSticky = createArticleOpt.isSticky
+          ? EArticleIsSticky.TRUE
+          : EArticleIsSticky.FALSE
       }
-      await Promise.all(promiseList)
-      ctx.success()
+
+      // 文章已创建时更新文章内容，否则新增文章并返回id
+      let insertId: number | undefined
+      if (articleId) {
+        await articlesService.updateArticleById(articleId, createArticleOpt)
+      } else {
+        insertId = (
+          (await articlesService.createArticle(
+            createArticleOpt as ICreateArticleParams,
+          )) as OkPacketParams
+        ).insertId
+      }
+      // 更新tags
+      if (tags) {
+        await articlesService.createTagsToAtc(articleId ?? insertId, tags)
+      }
+
+      ctx.success(insertId ? { insertId } : null, { msg: '保存成功' })
     } catch (error: any) {
+      console.log(error)
       ctx.fail(error)
     }
   }
+
+  // async createTagsToAtc(ctx: DefaultContext) {
+  //   try {
+  //     const { articleId } = ctx.params
+  //     const { tagIds } = ctx.request.body
+  //     const promiseList = []
+
+  //     await articlesService.clearTags(articleId)
+  //     for (const tagId of tagIds) {
+  //       promiseList.push(articlesService.createTagToAtc(articleId, tagId))
+  //     }
+  //     await Promise.all(promiseList)
+  //     ctx.success()
+  //   } catch (error: any) {
+  //     ctx.fail(error)
+  //   }
+  // }
 
   async updateArticleById(ctx: DefaultContext) {
     try {

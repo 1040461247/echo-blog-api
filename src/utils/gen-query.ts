@@ -86,3 +86,17 @@ export function optToUpdateQuery(option: any) {
 
   return { updateQuery, updateVals }
 }
+
+export function optToInsertQuery(option: any) {
+  const insertArr: string[] = []
+  const insertVals: any[] = []
+  const optKeys = Object.keys(option)
+
+  for (const key of optKeys) {
+    insertVals.push(option[key])
+    insertArr.push(`${camelToUnderscore(key)}`)
+  }
+  const insertQuery = insertArr.join(', ')
+
+  return { insertQuery, insertVals }
+}
