@@ -1,11 +1,22 @@
 import KoaRouter from '@koa/router'
 import fileController from '../controllers/file.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
-import { avatarHandler, illustrationHandler, coverHandler } from '../middlewares/file.middleware'
+import {
+  avatarHandler,
+  illustrationHandler,
+  coverHandler,
+  illustrationOffsiteHandler,
+} from '../middlewares/file.middleware'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const fileRouter = new KoaRouter({ prefix: '/upload' })
-const { createAvatar, createIllustration, createCover } = fileController
+const {
+  createAvatar,
+  createIllustration,
+  createIllustrationOffsite,
+  createCover,
+  removeArticleCover,
+} = fileController
 
 /**
  * @swagger
@@ -56,6 +67,11 @@ fileRouter.post('/avatar', verifyAuth, avatarHandler, createAvatar)
  *        schema:
  *          type: number
  *          example: 1
+ *      - in: query
+ *        name: mark
+ *        schema:
+ *          type: number
+ *          example: 1
  *    requestBody:
  *      required: true
  *      content:
@@ -71,7 +87,46 @@ fileRouter.post('/avatar', verifyAuth, avatarHandler, createAvatar)
  *      200:
  *        description: 上传成功
  */
-fileRouter.post('/illustration', verifyAuth, illustrationHandler, createIllustration)
+fileRouter.post('/illustration', verifyAuthCms, illustrationHandler, createIllustration)
+
+/**
+ * @swagger
+ * /upload/illustration/offsite:
+ *  post:
+ *    tags: [Upload]
+ *    summary: 根据站外图片的url上传文章配图
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: query
+ *        name: articleId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *      - in: query
+ *        name: mark
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            properties:
+ *              url:
+ *                type: string
+ *                example: http://localhost:8000/xxx.img
+ *    responses:
+ *      200:
+ *        description: 上传成功
+ */
+fileRouter.post(
+  '/illustration/offsite',
+  verifyAuthCms,
+  illustrationOffsiteHandler,
+  createIllustrationOffsite,
+)
 
 /**
  * @swagger
@@ -102,5 +157,25 @@ fileRouter.post('/illustration', verifyAuth, illustrationHandler, createIllustra
  *        description: success
  */
 fileRouter.post('/:articleId/cover', verifyAuthCms, coverHandler, createCover)
+
+/**
+ * @swagger
+ * /articles/{articleId}/cover:
+ *  delete:
+ *    tags: [Upload]
+ *    summary: 删除文章封面
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        schema:
+ *          type: number
+ *          example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+fileRouter.delete('/:articleId/cover', verifyAuth, removeArticleCover)
 
 module.exports = fileRouter

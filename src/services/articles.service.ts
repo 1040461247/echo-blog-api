@@ -278,8 +278,14 @@ class ArticlesService {
 
   async getIllustrationByFilename(filename: string) {
     try {
-      const statement = `SELECT * FROM file_illustration WHERE filename = ?;`
-      const [res] = (await connection.execute(statement, [filename])) as RowDataPacket[]
+      const statement = `
+        SELECT fi.mimetype mimetype, fi.filename filename FROM file_illustration fi
+        WHERE filename = ?
+        UNION
+        SELECT fit.mimetype mimetype, fit.filename filename FROM file_illustration_temp fit
+        WHERE filename = ?;
+      `
+      const [res] = (await connection.execute(statement, [filename, filename])) as RowDataPacket[]
       return res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)

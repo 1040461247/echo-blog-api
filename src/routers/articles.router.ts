@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router'
 import articlesController from '../controllers/articles.controller'
-import { verifyAuth, verifyPermission } from '../middlewares/auth.middleware'
+import { verifyPermission } from '../middlewares/auth.middleware'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 
 const articlesRouter = new KoaRouter({ prefix: '/articles' })
@@ -11,13 +11,10 @@ const {
   getArticleListByTagId,
   getArticleListByCateId,
   getArticleById,
-  getIllustration,
   getArticleCover,
-  // createArticle,
+  getIllustration,
   saveArticle,
-  // createTagsToAtc,
   updateArticleById,
-  removeArticleCover,
 } = articlesController
 
 /**
@@ -133,24 +130,6 @@ articlesRouter.get('/:articleId', getArticleById)
 
 /**
  * @swagger
- * /articles/illustration/{filename}:
- *  get:
- *    tags: [Articles]
- *    summary: 获取文章配图
- *    parameters:
- *      - in: path
- *        name: filename
- *        required: true
- *        schema:
- *          type: string
- *    responses:
- *      200:
- *        description: 返回文章配图
- */
-articlesRouter.get('/illustration/:filename', getIllustration)
-
-/**
- * @swagger
  * /articles/{articleId}/cover:
  *  get:
  *    tags: [Articles]
@@ -169,42 +148,21 @@ articlesRouter.get('/:articleId/cover', getArticleCover)
 
 /**
  * @swagger
- * /articles:
- *  post:
+ * /articles/illustration/{filename}:
+ *  get:
  *    tags: [Articles]
- *    summary: 新建文章
- *    security:
- *      - bearerAuth: []
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              title:
- *                type: string
- *                example: JavaScript从入门到放弃
- *              content:
- *                type: string
- *                example: hello world
- *              description:
- *                type: string
- *                example: article`s descripbe
- *              categoryId:
- *                type: number
- *                example: 1
- *              coverUrl:
- *                type: string
- *                required: false
- *              isSticky:
- *                type: number
- *                required: false
+ *    summary: 获取指定的文章配图
+ *    parameters:
+ *      - in: path
+ *        name: filename
+ *        required: true
+ *        schema:
+ *          type: string
  *    responses:
  *      200:
- *        description: 新建成功
+ *        description: 返回文章配图
  */
-// articlesRouter.post('/', verifyAuth, createArticle)
+articlesRouter.get('/illustration/:filename', getIllustration)
 
 /**
  * @swagger
@@ -257,36 +215,6 @@ articlesRouter.post('/save', verifyAuthCms, saveArticle)
 
 /**
  * @swagger
- * /articles/{articleId}/tags:
- *  post:
- *    tags: [Articles]
- *    summary: 添加文章标签
- *    security:
- *      - bearerAuth: []
- *    parameters:
- *      - in: path
- *        name: articleId
- *        required: true
- *        example: 1
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              tagIds:
- *                type: array
- *                items:
- *                  type: number
- *    responses:
- *      200:
- *        description: success
- */
-// articlesRouter.post('/:articleId/tags', verifyAuth, verifyPermission('articles'), createTagsToAtc)
-
-/**
- * @swagger
  * /articles/{articleId}:
  *  patch:
  *    tags: [Articles]
@@ -331,30 +259,5 @@ articlesRouter.post('/save', verifyAuthCms, saveArticle)
  *        description: success
  */
 articlesRouter.patch('/:articleId', verifyAuthCms, verifyPermission('articles'), updateArticleById)
-
-/**
- * @swagger
- * /articles/{articleId}/cover:
- *  delete:
- *    tags: [Articles]
- *    summary: 删除文章封面
- *    security:
- *      - bearerAuth: []
- *    parameters:
- *      - in: path
- *        name: articleId
- *        schema:
- *          type: number
- *          example: 1
- *    responses:
- *      200:
- *        description: success
- */
-articlesRouter.delete(
-  '/:articleId/cover',
-  verifyAuth,
-  verifyPermission('articles'),
-  removeArticleCover,
-)
 
 module.exports = articlesRouter

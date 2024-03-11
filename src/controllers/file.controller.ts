@@ -7,11 +7,16 @@ import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
 import type { IFileAvatar, IFileIllustration } from '../types'
 import usersService from '../services/users.service'
+import { MISSING_PERAMATERS } from '../config/error-types.config'
+
+interface IResData {
+  errFiles?: string[]
+  succMap: Record<string, string>
+}
 
 class FileController {
   async createAvatar(ctx: DefaultContext) {
     try {
-      console.log(ctx.req.body)
       const { filename, mimetype, size } = ctx.req.file
       const { id } = ctx.user!
 
@@ -41,14 +46,46 @@ class FileController {
   async createIllustration(ctx: DefaultContext) {
     try {
       const files = ctx.req.files
-      const { articleId } = ctx.query
+      const { articleId, mark } = ctx.query
 
-      for (const file of files) {
-        const { filename, mimetype, size } = file
-        await fileService.createIllustration(filename, mimetype, size, articleId)
+      if (articleId) {
+        await fileService.createIllustration(files, articleId)
+      } else if (mark) {
+        await fileService.createIllustrationToTemp(files, mark)
+      } else {
+        ctx.fail(new Error(MISSING_PERAMATERS))
       }
-      ctx.success()
+
+      const fileMap: Record<string, string> = {}
+      for (const file of files) {
+        const { filename, originalname } = file
+        fileMap[originalname] = `${process.env.APP_BASE_URL}/articles/illustration/${filename}`
+      }
+      ctx.success({ succMap: fileMap } as IResData)
     } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async createIllustrationOffsite(ctx: DefaultContext) {
+    try {
+      const { originalURL, filename } = ctx.file
+      const { articleId, mark } = ctx.query
+
+      if (articleId) {
+        await fileService.createIllustration([ctx.file], articleId)
+      } else if (mark) {
+        await fileService.createIllustrationToTemp([ctx.file], mark)
+      } else {
+        ctx.fail(new Error(MISSING_PERAMATERS))
+      }
+
+      ctx.success({
+        originalURL,
+        url: `${process.env.APP_BASE_URL}/articles/illustration/${filename}`,
+      })
+    } catch (error: any) {
+      console.log(error)
       ctx.fail(error)
     }
   }
@@ -77,6 +114,27 @@ class FileController {
         await articlesService.updateArticleCover(articleId)
         ctx.success({ insertId: insertRes.insertId }, { msg: '文章封面上传成功' })
       }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeArticleCover(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
+      if (!queryRes) {
+        return ctx.success(null, { msg: '文章封面不存在' })
+      }
+
+      const { filename } = queryRes
+      const promiseList = []
+      promiseList.push(fs.unlink(`${ILLUSTRATION_PATH}/${filename}`))
+      promiseList.push(fileService.removeCover(articleId))
+      promiseList.push(articlesService.removeArticleCover(articleId))
+      await Promise.all(promiseList)
+
+      ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }

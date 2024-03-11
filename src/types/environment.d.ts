@@ -4,6 +4,7 @@ declare global {
       APP_PROTOCOL: string
       APP_HOST: string
       APP_PORT: string
+      APP_BASE_URL: string
       MYSQL_HOST: string
       MYSQL_PORT: string
       MYSQL_USER: string

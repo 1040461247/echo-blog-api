@@ -1,0 +1,3 @@
+[2024-03-10T10:05:23.138] [INFO] http - ::1 - - "OPTIONS /cms-authorized HTTP/1.1" 204 - "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+[2024-03-10T10:05:23.481] [INFO] http - ::1 - - "GET /cms-authorized HTTP/1.1" 200 70 "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+[2024-03-10T10:05:23.540] [INFO] http - ::1 - - "GET /menu/1 HTTP/1.1" 200 761 "http://localhost:3001/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"

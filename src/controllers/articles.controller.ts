@@ -3,7 +3,6 @@ import articlesService, {
   EArticleIsSticky,
   ICreateArticleParams,
 } from '../services/articles.service'
-import fileService from '../services/file.service'
 import { ILLUSTRATION_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
@@ -72,6 +71,20 @@ class ArticlesController {
     }
   }
 
+  async getArticleCover(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
+
+      if (queryRes) {
+        ctx.response.set('content-type', queryRes.mimetype)
+        ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
+      }
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
   async getIllustration(ctx: DefaultContext) {
     try {
       const { filename } = ctx.params
@@ -87,41 +100,6 @@ class ArticlesController {
       ctx.fail(error)
     }
   }
-
-  async getArticleCover(ctx: DefaultContext) {
-    try {
-      const { articleId } = ctx.params
-      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
-
-      if (queryRes) {
-        ctx.response.set('content-type', queryRes.mimetype)
-        ctx.body = fs.createReadStream(`${ILLUSTRATION_PATH}/${queryRes.filename}`)
-      }
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  // async createArticle(ctx: DefaultContext) {
-  //   try {
-  //     const { title, content, categoryId, coverUrl, isSticky, description } = ctx.request
-  //       .body as IArticles
-  //     const { id } = ctx.user!
-
-  //     const insertRes = (await articlesService.createArticle(
-  //       title,
-  //       content,
-  //       id!,
-  //       categoryId,
-  //       coverUrl,
-  //       isSticky,
-  //       description,
-  //     )) as OkPacketParams
-  //     ctx.success({ insertId: insertRes.insertId }, { msg: '文章新增成功' })
-  //   } catch (error: any) {
-  //     ctx.fail(error)
-  //   }
-  // }
 
   async saveArticle(ctx: DefaultContext) {
     try {
@@ -159,23 +137,6 @@ class ArticlesController {
     }
   }
 
-  // async createTagsToAtc(ctx: DefaultContext) {
-  //   try {
-  //     const { articleId } = ctx.params
-  //     const { tagIds } = ctx.request.body
-  //     const promiseList = []
-
-  //     await articlesService.clearTags(articleId)
-  //     for (const tagId of tagIds) {
-  //       promiseList.push(articlesService.createTagToAtc(articleId, tagId))
-  //     }
-  //     await Promise.all(promiseList)
-  //     ctx.success()
-  //   } catch (error: any) {
-  //     ctx.fail(error)
-  //   }
-  // }
-
   async updateArticleById(ctx: DefaultContext) {
     try {
       const { articleId } = ctx.params
@@ -185,27 +146,6 @@ class ArticlesController {
       }
 
       await articlesService.updateArticleById(articleId, modifiedData)
-      ctx.success()
-    } catch (error: any) {
-      ctx.fail(error)
-    }
-  }
-
-  async removeArticleCover(ctx: DefaultContext) {
-    try {
-      const { articleId } = ctx.params
-      const queryRes = (await articlesService.getArticleCoverById(articleId)) as IFileIllustration
-      if (!queryRes) {
-        return ctx.success(null, { msg: '文章封面不存在' })
-      }
-
-      const { filename } = queryRes
-      const promiseList = []
-      promiseList.push(fs.promises.unlink(`${ILLUSTRATION_PATH}/${filename}`))
-      promiseList.push(fileService.removeCover(articleId))
-      promiseList.push(articlesService.removeArticleCover(articleId))
-      await Promise.all(promiseList)
-
       ctx.success()
     } catch (error: any) {
       ctx.fail(error)

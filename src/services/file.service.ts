@@ -1,6 +1,13 @@
 import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 
+// Types
+interface ICreateIllustrations {
+  filename: string
+  mimetype: string
+  size: number
+}
+
 class FileService {
   async createAvatar(filename: string, mimetype: string, size: number, user_id: number) {
     try {
@@ -12,10 +19,36 @@ class FileService {
     }
   }
 
-  async createIllustration(filename: string, mimetype: string, size: number, article_id: number) {
+  async createIllustration(files: ICreateIllustrations[], articleId: number) {
+    const insertVals: any[] = []
+    const valPlaceHolder = files
+      .map((item) => {
+        insertVals.push(item.filename, item.mimetype, item.size, articleId)
+        return '(?, ?, ?, ?)'
+      })
+      .join(', ')
+
     try {
-      const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id) VALUES (?, ?, ?, ?);`
-      const [res] = await connection.execute(statement, [filename, mimetype, size, article_id])
+      const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id) VALUES ${valPlaceHolder};`
+      const [res] = await connection.execute(statement, insertVals)
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async createIllustrationToTemp(files: ICreateIllustrations[], mark: string) {
+    const insertVals: any[] = []
+    const valPlaceHolder = files
+      .map((item) => {
+        insertVals.push(item.filename, item.mimetype, item.size, mark)
+        return '(?, ?, ?, ?)'
+      })
+      .join(', ')
+
+    try {
+      const statement = `INSERT INTO file_illustration_temp (filename, mimetype, size, mark) VALUES ${valPlaceHolder};`
+      const [res] = await connection.execute(statement, insertVals)
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
