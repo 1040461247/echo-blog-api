@@ -8,6 +8,7 @@ import type { DefaultContext } from 'koa'
 import type { OkPacketParams } from 'mysql2'
 import type { IFileIllustration } from '../types'
 import objectFilter from '../utils/object-filter'
+import fileService from '../services/file.service'
 
 function mapTagsToJson(queryRes: any) {
   return queryRes.map((item: any) => {
@@ -103,9 +104,9 @@ class ArticlesController {
 
   async saveArticle(ctx: DefaultContext) {
     try {
-      const { id: articleId, tags } = ctx.request.body
+      const { id: articleId, tags, mark } = ctx.request.body
       const { id: userId } = ctx.user!
-      const createArticleOpt = objectFilter({ ...ctx.request.body, userId }, ['id', 'tags'])
+      const createArticleOpt = objectFilter({ ...ctx.request.body, userId }, ['id', 'tags', 'mark'])
 
       // 校验isSticky类型，为boolean值时转为枚举类型
       if (typeof createArticleOpt.isSticky === 'boolean') {
@@ -124,11 +125,10 @@ class ArticlesController {
             createArticleOpt as ICreateArticleParams,
           )) as OkPacketParams
         ).insertId
+        insertId && (await fileService.saveIllustrationFromTemp(mark, insertId))
       }
       // 更新tags
-      if (tags) {
-        await articlesService.createTagsToAtc(articleId ?? insertId, tags)
-      }
+      tags && (await articlesService.createTagsToAtc(articleId ?? insertId, tags))
 
       ctx.success(insertId ? { insertId } : null, { msg: '保存成功' })
     } catch (error: any) {

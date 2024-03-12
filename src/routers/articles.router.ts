@@ -207,6 +207,9 @@ articlesRouter.get('/illustration/:filename', getIllustration)
  *              visibility:
  *                type: number
  *                example: 0
+ *              mark:
+ *                type: string
+ *                example: 123
  *    responses:
  *      200:
  *        description: success

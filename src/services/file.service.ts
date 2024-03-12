@@ -55,6 +55,20 @@ class FileService {
     }
   }
 
+  async saveIllustrationFromTemp(mark: string, articleId: number) {
+    try {
+      const statement = `
+        INSERT INTO file_illustration (filename, mimetype, size, article_id)
+        SELECT filename, mimetype, size, ${articleId} FROM file_illustration_temp
+        WHERE mark = ?;
+      `
+      const [res] = await connection.execute(statement, [mark])
+      return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
   async createCover(filename: string, mimetype: string, size: number, articleId: number) {
     try {
       const statement = `INSERT INTO file_illustration (filename, mimetype, size, article_id, is_cover) VALUES (?, ?, ?, ?, 1);`
