@@ -69,7 +69,7 @@ export interface ICreateArticleParams {
 }
 
 class ArticlesService {
-  async getArticleList(offset = '0', limit = '1') {
+  async getArticleList(offset = '0', limit = '10') {
     try {
       const statement = `
       SELECT

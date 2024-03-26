@@ -8,7 +8,16 @@ class StatisticsService {
       const resObj = {}
 
       for (const resource of resourceList) {
-        const statement = `SELECT COUNT(*) ${resource}Count FROM ${resource};`
+        let statement: string
+
+        switch (resource) {
+          case 'articles':
+            statement = `SELECT COUNT(*) articlesCount FROM articles WHERE state != '0' AND visibility != '0';`
+            break
+          default:
+            statement = `SELECT COUNT(*) ${resource}Count FROM ${resource};`
+        }
+
         const res = connection.execute(statement).then((res: any) => {
           Object.assign(resObj, res[0][0])
         })
