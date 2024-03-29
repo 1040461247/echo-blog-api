@@ -10,7 +10,7 @@ class CategoriesService {
           (
             SELECT COUNT(*)
             FROM articles a
-            WHERE c.id = a.category_id
+            WHERE c.id = a.category_id AND a.state != '0' AND a.visibility != '0'
           ) articleCount
         FROM categories c;
       `
@@ -28,7 +28,7 @@ class CategoriesService {
           (
             SELECT COUNT(*)
             FROM articles a
-            WHERE c.id = a.category_id
+            WHERE c.id = a.category_id AND a.state != '0' AND a.visibility != '0'
           ) articleCount
         FROM categories c
         WHERE c.id = ?;

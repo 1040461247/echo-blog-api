@@ -50,7 +50,7 @@ class UsersController {
       const [{ id, name }] = (await userService.getUserByName(ctx.request.body.name)) as IUsers[]
 
       // 注册成功后，登录用户
-      const token = signToken({ id: id! })
+      const token = await signToken({ id: id! })
       ctx.success({ id, name, token })
     } catch (error: any) {
       ctx.fail(error)

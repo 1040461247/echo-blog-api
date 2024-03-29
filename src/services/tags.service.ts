@@ -10,7 +10,8 @@ class TagsService {
           (
             SELECT COUNT(*)
             FROM articles_ref_tags art
-            WHERE tags.id = art.tag_id
+            LEFT JOIN articles a ON a.id = art.article_id
+            WHERE tags.id = art.tag_id AND a.state != '0' AND a.visibility != '0'
           ) articleCount
         FROM tags;
       `

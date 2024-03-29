@@ -174,20 +174,20 @@ class ArticlesService {
           JSON_OBJECT('id', u.id, 'name', u.name, 'avatarUrl', u.avatar_url) AS author,
           JSON_OBJECT('id', c.id, 'name', c.name) AS category,
           NULLIF(
-              COALESCE(
-                  JSON_ARRAYAGG(
-                      JSON_OBJECT('id', tags.id, 'name', tags.name)
-                  ),
-                  '[{"id": null, "name": null}]'
+            COALESCE(
+              JSON_ARRAYAGG(
+                JSON_OBJECT('id', tags.id, 'name', tags.name)
               ),
               '[{"id": null, "name": null}]'
+            ),
+            '[{"id": null, "name": null}]'
           ) AS tags
         FROM categories c
         LEFT JOIN articles atc ON atc.category_id = c.id
         LEFT JOIN users u ON u.id = atc.user_id
         LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
         LEFT JOIN tags ON tags.id = art.tag_id
-        WHERE c.id = ?
+        WHERE c.id = 1 AND atc.state != '0' AND atc.visibility != '0'
         GROUP BY atc.id, c.id;
       `
       const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
@@ -226,7 +226,7 @@ class ArticlesService {
         LEFT JOIN users u ON u.id = atc.user_id
         LEFT JOIN categories c ON c.id = atc.category_id
         LEFT JOIN tags ON tags.id = art.tag_id
-        WHERE art.tag_id = ?
+        WHERE art.tag_id = ? AND atc.state != '0' AND atc.visibility != '0'
         GROUP BY atc.id;
       `
       const [res] = (await connection.execute(statement, [tagId])) as RowDataPacket[][]

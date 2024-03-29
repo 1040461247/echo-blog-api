@@ -1,2 +1,0 @@
-[2024-02-23T14:29:20.580] [INFO] http - ::1 - - "GET /api HTTP/1.1" 200 18267 "" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"
-[2024-02-23T14:29:27.493] [INFO] http - ::1 - - "GET /favicon.png HTTP/1.1" 200 - "http://localhost:8000/api" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36"

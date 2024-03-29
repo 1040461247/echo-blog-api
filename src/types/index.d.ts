@@ -30,7 +30,7 @@ interface IArticles {
   albumUrl?: string
   userId?: number
   categoryId: number
-  isSticky?: 0 | 1
+  isSticky?: '0' | '1'
   coverUrl?: string
   createTime?: string
   updateTime?: string
