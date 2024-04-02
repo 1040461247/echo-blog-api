@@ -126,7 +126,7 @@ categoriesRouter.post('/', verifyAuthCms, checkForCategoryExists, createCategory
  *          schema:
  *            type: object
  *            properties:
- *              newName:
+ *              category:
  *                type: string
  *                example: JavaScript高级程序设计
  *    responses:

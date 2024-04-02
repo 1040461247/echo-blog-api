@@ -304,11 +304,14 @@ class ArticlesService {
 
   async getArticlesTotal(queryOption: IArticleListQueryOption) {
     try {
-      const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'articles')
+      const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'a')
 
-      const statement = `SELECT COUNT(*) articlesTotal FROM articles ${
-        whereQuery ? whereQuery : ''
-      };`
+      const statement = `
+        SELECT COUNT(*) articlesTotal
+        FROM articles a
+        LEFT JOIN articles_ref_tags art ON art.article_id = a.id
+        ${whereQuery ? whereQuery : ''};
+      `
       const [res] = (await connection.execute(statement, whereVals)) as any
       return res[0].articlesTotal
     } catch (error) {

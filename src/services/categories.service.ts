@@ -63,7 +63,6 @@ class CategoriesService {
       const [res] = await connection.execute(statement, [...whereVals, offset, limit])
       return res
     } catch (error) {
-      console.log(error)
       throw new Error(DATABASE_ERROR)
     }
   }
@@ -87,10 +86,13 @@ class CategoriesService {
     }
   }
 
-  async getCategoriesTotal() {
+  async getCategoriesTotal(queryOption: ICategoryListQueryOption) {
     try {
-      const statement = `SELECT COUNT(*) categoriesTotal FROM categories;`
-      const [res] = (await connection.execute(statement)) as RowDataPacket[]
+      const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'categories')
+      const statement = `SELECT COUNT(*) categoriesTotal FROM categories ${
+        whereQuery ? whereQuery : ''
+      };`
+      const [res] = (await connection.execute(statement, whereVals)) as RowDataPacket[]
       return res[0].categoriesTotal
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -117,10 +119,10 @@ class CategoriesService {
     }
   }
 
-  async updateCategoryById(categoryId: number, newName: string) {
+  async updateCategoryById(categoryId: number, category: string) {
     try {
       const statement = `UPDATE categories SET name = ? WHERE id = ?;`
-      const [res] = await connection.execute(statement, [newName, categoryId])
+      const [res] = await connection.execute(statement, [category, categoryId])
       return res
     } catch (error) {
       throw new Error(DATABASE_ERROR)
@@ -146,16 +148,6 @@ class CategoriesService {
       throw new Error(DATABASE_ERROR)
     }
   }
-
-  // async hasRelatedAtc(categoryId: number) {
-  //   try {
-  //     const statement = `SELECT COUNT(*) relatedAtcCount FROM articles WHERE category_id = ?;`
-  //     const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[]
-  //     return res[0]?.relatedAtcCount !== 0
-  //   } catch (error) {
-  //     throw new Error(DATABASE_ERROR)
-  //   }
-  // }
 }
 
 export default new CategoriesService()

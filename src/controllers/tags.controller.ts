@@ -13,6 +13,16 @@ class TagsController {
     }
   }
 
+  async getTagListQuery(ctx: DefaultContext) {
+    try {
+      const tagList = await tagsService.getTagListQuery(ctx.query)
+      const tagTotal = await tagsService.getTagsTotal(ctx.query)
+      ctx.success(tagList, { total: tagTotal })
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
   async getTagById(ctx: DefaultContext) {
     try {
       const { tagId } = ctx.params
@@ -26,14 +36,19 @@ class TagsController {
   async createTag(ctx: DefaultContext) {
     try {
       const { tag } = ctx.request.body
-      const hasTag = await tagsService.hasTag(tag)
+      const insertRes = (await tagsService.createTag(tag)) as OkPacketParams
+      ctx.success({ insertId: insertRes.insertId })
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
 
-      if (hasTag) {
-        ctx.success(undefined, { msg: '标签已存在' })
-      } else {
-        const insertRes = (await tagsService.createTag(tag)) as OkPacketParams
-        ctx.success({ insertId: insertRes.insertId })
-      }
+  async updateTagById(ctx: DefaultContext) {
+    try {
+      const { tagId } = ctx.params
+      const { tag } = ctx.request.body
+      await tagsService.updateCategoryById(tagId, tag)
+      ctx.success()
     } catch (error: any) {
       ctx.fail(error)
     }
@@ -41,9 +56,15 @@ class TagsController {
 
   async removeTag(ctx: DefaultContext) {
     try {
+      // 当有关联文章时，无法删除
       const { tagId } = ctx.params
-      await tagsService.removeTagById(tagId)
-      ctx.success()
+      const relatedAtcCount = await tagsService.getRelatedAtcCount(tagId)
+      if (relatedAtcCount !== 0) {
+        ctx.fail(new Error('请先移除关联文章！'))
+      } else {
+        await tagsService.removeTagById(tagId)
+        ctx.success()
+      }
     } catch (error: any) {
       ctx.fail(error)
     }

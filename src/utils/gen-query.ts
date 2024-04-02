@@ -1,15 +1,17 @@
 import camelToUnderscore from './camel-to-underscore'
 
-export function optToWhereQuery(option: any, tableAlias: string) {
+export function optToWhereQuery(option: any, tableAlias: string, tagTAlias: string = 'art') {
   const conditionArr: string[] = []
   const whereVals: any[] = []
 
   // 特殊字段处理
   // tags字段生成IN查询语句
-  const tags = option['tags[]']
-  if (tags?.length > 0) {
+  const tags: string[] | string = option['tags[]'] ?? option['tags']
+  if (Array.isArray(tags)) {
     const idsStr = tags.join(', ')
-    conditionArr.push(`tags.id IN (${idsStr})`)
+    conditionArr.push(`${tagTAlias}.tag_id IN (${idsStr})`)
+  } else if (typeof tags === 'string') {
+    conditionArr.push(`${tagTAlias}.tag_id IN (${tags})`)
   }
 
   // 模糊查询字段
@@ -40,6 +42,7 @@ export function optToWhereQuery(option: any, tableAlias: string) {
     'title',
     'token ',
     'tags[]',
+    'tags',
     'createTime',
     'updateTime',
     'sort',

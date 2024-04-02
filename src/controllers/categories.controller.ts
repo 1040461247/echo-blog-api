@@ -18,7 +18,7 @@ class CategoriesController {
   async getCategoryListQuery(ctx: DefaultContext) {
     try {
       const cateList = await categoriesService.getCategoryListQuery(ctx.query)
-      const cateTotal = await categoriesService.getCategoriesTotal()
+      const cateTotal = await categoriesService.getCategoriesTotal(ctx.query)
       ctx.success(cateList, { total: cateTotal })
     } catch (error: any) {
       ctx.fail(error)
@@ -58,8 +58,8 @@ class CategoriesController {
 
   async removeCategoryById(ctx: DefaultContext) {
     try {
-      const { categoryId } = ctx.params
       // 当有关联文章时，无法删除
+      const { categoryId } = ctx.params
       const relatedAtcCount = await categoriesService.getRelatedAtcCount(categoryId)
       if (relatedAtcCount !== 0) {
         ctx.fail(new Error('请先移除关联文章！'))
