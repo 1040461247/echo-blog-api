@@ -15,6 +15,7 @@ const {
   getIllustration,
   saveArticle,
   updateArticleById,
+  removeArticleById,
 } = articlesController
 
 /**
@@ -262,5 +263,24 @@ articlesRouter.post('/save', verifyAuthCms, saveArticle)
  *        description: success
  */
 articlesRouter.patch('/:articleId', verifyAuthCms, verifyPermission('articles'), updateArticleById)
+
+/**
+ * @swagger
+ * /articles/{articleId}:
+ *  delete:
+ *    tags: [Articles]
+ *    summary: 根据id删除文章
+ *    security:
+ *      - bearerAuth: []
+ *    parameters:
+ *      - in: path
+ *        name: articleId
+ *        required: true
+ *        example: 1
+ *    responses:
+ *      200:
+ *        description: success
+ */
+articlesRouter.delete('/:articleId', verifyAuthCms, verifyPermission('articles'), removeArticleById)
 
 module.exports = articlesRouter

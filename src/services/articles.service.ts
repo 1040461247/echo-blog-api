@@ -43,7 +43,7 @@ export interface IArticleListQueryOption {
   visibility?: EArticleVisibility
   isSticky?: EArticleIsSticky
   createTime?: IDateRange
-  endTime?: IDateRange
+  updateTime?: IDateRange
   sort?: string
 }
 
@@ -399,6 +399,16 @@ class ArticlesService {
       const statement = `DELETE FROM articles_ref_tags WHERE article_id = ?;`
       const [res] = await connection.execute(statement, [articleId])
       return res
+    } catch (error) {
+      throw new Error(DATABASE_ERROR)
+    }
+  }
+
+  async removeArticleById(articleId: number) {
+    try {
+      const statement = `DELETE FROM articles WHERE id = ?;`
+      const [res] = (await connection.execute(statement, [articleId])) as RowDataPacket[]
+      return res[0]
     } catch (error) {
       throw new Error(DATABASE_ERROR)
     }

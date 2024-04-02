@@ -6,8 +6,20 @@ import type { ICategories } from '../types'
 class CategoriesController {
   async getCategoryList(ctx: DefaultContext) {
     try {
-      const queryRes = (await categoriesService.getCategoryList()) as ICategories[]
-      ctx.success(queryRes)
+      const { isAllAtcCount } = ctx.query
+      const queryAllCount = isAllAtcCount === ('true' || 'TRUE')
+      const queryRes = (await categoriesService.getCategoryList(queryAllCount)) as ICategories[]
+      ctx.success(queryRes, { total: queryRes.length })
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async getCategoryListQuery(ctx: DefaultContext) {
+    try {
+      const cateList = await categoriesService.getCategoryListQuery(ctx.query)
+      const cateTotal = await categoriesService.getCategoriesTotal()
+      ctx.success(cateList, { total: cateTotal })
     } catch (error: any) {
       ctx.fail(error)
     }
@@ -26,23 +38,35 @@ class CategoriesController {
   async createCategory(ctx: DefaultContext) {
     try {
       const { category } = ctx.request.body
-      const hasCategory = await categoriesService.hasCategory(category)
-      if (hasCategory) {
-        return ctx.success(undefined, { msg: '分类已存在' })
-      } else {
-        const insertRes = (await categoriesService.createCategory(category)) as OkPacketParams
-        ctx.success({ insertId: insertRes.insertId })
-      }
+      const insertRes = (await categoriesService.createCategory(category)) as OkPacketParams
+      ctx.success({ insertId: insertRes.insertId })
     } catch (error: any) {
       ctx.fail(error)
     }
   }
 
-  async removeCategory(ctx: DefaultContext) {
+  async updateCategoryById(ctx: DefaultContext) {
     try {
       const { categoryId } = ctx.params
-      await categoriesService.removeCategory(categoryId)
+      const { category } = ctx.request.body
+      await categoriesService.updateCategoryById(categoryId, category)
       ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
+
+  async removeCategoryById(ctx: DefaultContext) {
+    try {
+      const { categoryId } = ctx.params
+      // 当有关联文章时，无法删除
+      const relatedAtcCount = await categoriesService.getRelatedAtcCount(categoryId)
+      if (relatedAtcCount !== 0) {
+        ctx.fail(new Error('请先移除关联文章！'))
+      } else {
+        await categoriesService.removeCategory(categoryId)
+        ctx.success()
+      }
     } catch (error: any) {
       ctx.fail(error)
     }

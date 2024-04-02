@@ -1,6 +1,6 @@
 import camelToUnderscore from './camel-to-underscore'
 
-export function optToWhereQuery(option: any, mainTable: string) {
+export function optToWhereQuery(option: any, tableAlias: string) {
   const conditionArr: string[] = []
   const whereVals: any[] = []
 
@@ -12,21 +12,24 @@ export function optToWhereQuery(option: any, mainTable: string) {
     conditionArr.push(`tags.id IN (${idsStr})`)
   }
 
-  // title字段进行模糊查询
+  // 模糊查询字段
   if (option.title) {
-    conditionArr.push(`${mainTable}.title LIKE '%${option.title}%'`)
+    conditionArr.push(`${tableAlias}.title LIKE '%${option.title}%'`)
+  }
+  if (option.name) {
+    conditionArr.push(`${tableAlias}.name LIKE '%${option.name}%'`)
   }
 
   // 时间段查询
   if (option.createTime) {
     const timeRange = JSON.parse(option.createTime)
     whereVals.push(timeRange.startTime, timeRange.endTime)
-    conditionArr.push(`${mainTable}.create_time BETWEEN ? AND ?`)
+    conditionArr.push(`${tableAlias}.create_time BETWEEN ? AND ?`)
   }
   if (option.updateTime) {
     const timeRange = JSON.parse(option.updateTime)
     whereVals.push(timeRange.startTime, timeRange.endTime)
-    conditionArr.push(`${mainTable}.update_time BETWEEN ? AND ?`)
+    conditionArr.push(`${tableAlias}.update_time BETWEEN ? AND ?`)
   }
 
   // 生成查询语句
@@ -40,11 +43,12 @@ export function optToWhereQuery(option: any, mainTable: string) {
     'createTime',
     'updateTime',
     'sort',
+    'name',
   ]
   const keys = Object.keys(option).filter((item) => !oFileds.includes(item))
   for (const key of keys) {
     whereVals.push(option[key])
-    conditionArr.push(`${mainTable}.${camelToUnderscore(key)} = ?`)
+    conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} = ?`)
   }
   let whereQuery = conditionArr.join(' AND ')
   // 当有查询条件时，添加WHERE关键字
@@ -55,7 +59,11 @@ export function optToWhereQuery(option: any, mainTable: string) {
   return { whereQuery, whereVals }
 }
 
-export function optToSortQuery(sortStr: string | undefined, mainTable: string) {
+export function optToSortQuery(
+  sortStr: string | undefined,
+  tableAlias: string = '',
+  notSqlFiles?: string[],
+) {
   if (!sortStr) return null
   const sortArr: string[] = []
   const sortObj = JSON.parse(sortStr)
@@ -63,7 +71,13 @@ export function optToSortQuery(sortStr: string | undefined, mainTable: string) {
 
   sortKeys.map((item) => {
     const sortType = sortObj[item]
-    sortArr.push(`${mainTable}.${camelToUnderscore(item)} ${sortType === 'ascend' ? '' : 'DESC'}`)
+    const tablePre = tableAlias && tableAlias + '.'
+    const filedName = camelToUnderscore(item)
+    sortArr.push(
+      `${notSqlFiles?.includes(item) ? item : tablePre + filedName} ${
+        sortType === 'ascend' ? '' : 'DESC'
+      }`,
+    )
   })
   if (sortArr.length === 0) return null
 

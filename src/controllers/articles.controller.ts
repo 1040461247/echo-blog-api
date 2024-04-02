@@ -151,6 +151,16 @@ class ArticlesController {
       ctx.fail(error)
     }
   }
+
+  async removeArticleById(ctx: DefaultContext) {
+    try {
+      const { articleId } = ctx.params
+      await articlesService.removeArticleById(articleId)
+      ctx.success()
+    } catch (error: any) {
+      ctx.fail(error)
+    }
+  }
 }
 
 export default new ArticlesController()
