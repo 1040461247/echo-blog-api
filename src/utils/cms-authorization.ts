@@ -14,13 +14,15 @@ const TOKEN_EXPIRE_TIME = 24 * 60 * 60
 
 // Token白名单
 export async function addTokenToWhiteListCms(token: string, id: string) {
+  if (!token) return
   const redisClient = await getRedisClient()
   await redisClient.hSet(CMS_TOKEN_HASH, id, token)
   redisExpire('hash', CMS_TOKEN_HASH, id, TOKEN_EXPIRE_TIME * 1000)
-  redisClient.quit()
+  await redisClient.quit()
 }
 
 export async function hasTokenInWhiteListCms(id: string) {
+  if (!id) return
   const redisClient = await getRedisClient()
   const hasToken = await redisClient.hExists(CMS_TOKEN_HASH, id)
   await redisClient.quit()
@@ -37,7 +39,7 @@ export async function getTokenFromWhiteListCms(id: string) {
   // 获取Token
   const redisClient = await getRedisClient()
   const token = await redisClient.hGet(CMS_TOKEN_HASH, id)
-  redisClient.quit()
+  await redisClient.quit()
   return token
 }
 
@@ -51,7 +53,7 @@ export async function remTokenFromWhiteListCms(id: string) {
   // 删除Token
   const redisClient = await getRedisClient()
   await redisClient.hDel(CMS_TOKEN_HASH, id)
-  redisClient.quit()
+  await redisClient.quit()
 }
 
 // 签发Token

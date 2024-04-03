@@ -10,12 +10,12 @@ const recordMessageOfLikeComment: Middleware = async (ctx, next) => {
   const { id } = ctx.user!
 
   const [comment] = (await articlesCommentsService.getCommentById(commentId)) as RowDataPacket[]
-  const { user, content, article_id } = comment
+  const { user, content, articleId } = comment
   const msgContent = `“${content}”`
 
   if (id === user.id) return await next()
 
-  await messageRecordService.createMessage('0', id!, user.id, msgContent, article_id)
+  await messageRecordService.createMessage('0', id!, user.id, msgContent, articleId)
   await next()
 }
 

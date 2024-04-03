@@ -1,6 +1,6 @@
 import KoaRouter from '@koa/router'
 import usersController from '../controllers/users.controller'
-import { verifyRegisterInfo, encrypPwd } from '../middlewares/users.middleware'
+import { verifyRegisterInfo, encrypPwd, checkForUserName } from '../middlewares/users.middleware'
 import { verifyAuth } from '../middlewares/auth.middleware'
 
 const usersRouter = new KoaRouter({ prefix: '/users' })
@@ -82,7 +82,7 @@ usersRouter.get('/:userId', getUserById)
  *       200:
  *         description: 用户注册成功
  */
-usersRouter.post('/', verifyRegisterInfo, encrypPwd, createUser)
+usersRouter.post('/', verifyRegisterInfo, checkForUserName, encrypPwd, createUser)
 
 /**
  * @swagger
@@ -108,6 +108,6 @@ usersRouter.post('/', verifyRegisterInfo, encrypPwd, createUser)
  *      200:
  *        description: success
  */
-usersRouter.post('/update', verifyAuth, encrypPwd, updateUser)
+usersRouter.post('/update', verifyAuth, checkForUserName, encrypPwd, updateUser)
 
 module.exports = usersRouter

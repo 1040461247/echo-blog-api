@@ -98,6 +98,7 @@ class ArticlesService {
       LEFT JOIN tags ON tags.id = art.tag_id
       WHERE state = '1' AND visibility = '1'
       GROUP BY atc.id
+      ORDER BY atc.is_sticky DESC, atc.id
       LIMIT ?, ?;
     `
       const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]
@@ -188,7 +189,8 @@ class ArticlesService {
         LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
         LEFT JOIN tags ON tags.id = art.tag_id
         WHERE c.id = 1 AND atc.state != '0' AND atc.visibility != '0'
-        GROUP BY atc.id, c.id;
+        GROUP BY atc.id, c.id
+        ORDER BY atc.is_sticky DESC, atc.id
       `
       const [res] = (await connection.execute(statement, [categoryId])) as RowDataPacket[][]
       return sortArticles(res as IArticles[])
@@ -227,7 +229,8 @@ class ArticlesService {
         LEFT JOIN categories c ON c.id = atc.category_id
         LEFT JOIN tags ON tags.id = art.tag_id
         WHERE art.tag_id = ? AND atc.state != '0' AND atc.visibility != '0'
-        GROUP BY atc.id;
+        GROUP BY atc.id
+        ORDER BY atc.is_sticky DESC, atc.id;
       `
       const [res] = (await connection.execute(statement, [tagId])) as RowDataPacket[][]
       return sortArticles(res as IArticles[])

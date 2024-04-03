@@ -6,6 +6,22 @@ import getUserSystemInfo from '../utils/get-user-system-info'
 import md5Encryp from '../utils/md5-encryp'
 import getRedisClient, { REGISTERING_SET } from '../app/redis'
 
+const checkForUserName: Middleware = async (ctx, next) => {
+  const { name } = ctx.request.body as IUsers
+  if (!name) {
+    // 当没有name时放行（只在有name的情况下校验）
+    await next()
+  } else {
+    const userRes = await usersService.getUserByName(name)
+    const userExistsed = Array.isArray(userRes) && userRes.length > 0
+    if (userExistsed) {
+      ctx.fail(new Error(USER_ALREADY_EXISTS))
+    } else {
+      await next()
+    }
+  }
+}
+
 const verifyRegisterInfo: Middleware = async (ctx, next) => {
   const { name, password, phoneNum } = ctx.request.body as IUsers
   // 判断用户名密码不为空
@@ -14,11 +30,11 @@ const verifyRegisterInfo: Middleware = async (ctx, next) => {
   }
 
   // 判断用户名是否存在
-  const userRes = await usersService.getUserByName(name)
-  const userExistsed = Array.isArray(userRes) && userRes.length > 0
-  if (userExistsed) {
-    return ctx.fail(new Error(USER_ALREADY_EXISTS))
-  }
+  // const userRes = await usersService.getUserByName(name)
+  // const userExistsed = Array.isArray(userRes) && userRes.length > 0
+  // if (userExistsed) {
+  //   return ctx.fail(new Error(USER_ALREADY_EXISTS))
+  // }
 
   // 判断手机号是否经过验证
   const redisClient = await getRedisClient()
@@ -63,4 +79,10 @@ const updateUserLoginTime: Middleware = async (ctx, next) => {
   }
 }
 
-export { encrypPwd, updateUserSystemInfo, verifyRegisterInfo, updateUserLoginTime }
+export {
+  encrypPwd,
+  updateUserSystemInfo,
+  verifyRegisterInfo,
+  updateUserLoginTime,
+  checkForUserName,
+}

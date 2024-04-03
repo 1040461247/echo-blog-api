@@ -2,6 +2,7 @@ import articlesCommentsService from '../services/articles-comments.service'
 import type { DefaultContext } from 'koa'
 import type { OkPacketParams, RowDataPacket } from 'mysql2'
 import type { IArticlesComments } from '../types'
+import { MISSING_PERAMATERS } from '../config/error-types.config'
 
 class ArticlesCommentsController {
   async getCommentsByAtcId(ctx: DefaultContext) {
@@ -57,9 +58,13 @@ class ArticlesCommentsController {
   async createLikes(ctx: DefaultContext) {
     try {
       const { commentId } = ctx.request.body
-      const { id } = ctx.user!
-      await articlesCommentsService.createLikes(id!, commentId)
-      ctx.success(null, { msg: '点赞成功' })
+      const { id } = ctx.user as any
+      if (commentId && id) {
+        await articlesCommentsService.createLikes(id, commentId)
+        ctx.success(null, { msg: '点赞成功' })
+      } else {
+        ctx.fail(new Error(MISSING_PERAMATERS))
+      }
     } catch (error: any) {
       ctx.fail(error)
     }

@@ -31,7 +31,7 @@ const errorHandle = (err: Error, ctx: DefaultContext) => {
       break
     case USER_ALREADY_EXISTS:
       status = 409
-      msg = '用户已存在'
+      msg = '用户名已存在'
       break
     case UNAUTHORIZATION:
       status = 401

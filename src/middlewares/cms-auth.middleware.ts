@@ -7,11 +7,13 @@ import { RowDataPacket } from 'mysql2'
 const verifyAuthCms: Middleware = async (ctx, next) => {
   try {
     const token = ctx.header.authorization?.replace('Bearer ', '')
-    if (!token) ctx.fail(new Error(UNAUTHORIZATION))
-
-    const user = await verifyTokenCms(token!)
-    ctx.user! = user
-    await next()
+    if (token) {
+      const user = await verifyTokenCms(token)
+      ctx.user! = user
+      await next()
+    } else {
+      ctx.fail(new Error(UNAUTHORIZATION))
+    }
   } catch (error: any) {
     ctx.fail(error)
   }
