@@ -13,7 +13,7 @@ const {
   getArticleById,
   getArticleCover,
   getIllustration,
-  saveArticle,
+  commitArticle,
   updateArticleById,
   removeArticleById,
 } = articlesController
@@ -167,10 +167,10 @@ articlesRouter.get('/illustration/:filename', getIllustration)
 
 /**
  * @swagger
- * /articles/save:
+ * /articles/commit:
  *  post:
  *    tags: [Articles]
- *    summary: 保存编辑中的文章
+ *    summary: 提交文章
  *    security:
  *      - bearerAuth: []
  *    requestBody:
@@ -202,20 +202,17 @@ articlesRouter.get('/illustration/:filename', getIllustration)
  *              isSticky:
  *                type: number
  *                example: 0
- *              state:
- *                type: number
- *                example: 0
- *              visibility:
- *                type: number
- *                example: 0
  *              mark:
  *                type: string
  *                example: 123
+ *              type:
+ *                type: string
+ *                example: save
  *    responses:
  *      200:
  *        description: success
  */
-articlesRouter.post('/save', verifyAuthCms, saveArticle)
+articlesRouter.post('/commit', verifyAuthCms, commitArticle)
 
 /**
  * @swagger

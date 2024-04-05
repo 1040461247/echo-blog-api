@@ -10,6 +10,12 @@ import type { IFileIllustration } from '../types'
 import objectFilter from '../utils/object-filter'
 import fileService from '../services/file.service'
 
+// Types
+enum ECommitArticleType {
+  SAVE = 'save',
+  PUBLISH = 'publish',
+}
+
 function mapTagsToJson(queryRes: any) {
   return queryRes.map((item: any) => {
     const articleList = { ...item }
@@ -103,11 +109,27 @@ class ArticlesController {
     }
   }
 
-  async saveArticle(ctx: DefaultContext) {
+  async commitArticle(ctx: DefaultContext) {
     try {
-      const { id: articleId, tags, mark } = ctx.request.body
+      const { id: articleId, tags, mark, type } = ctx.request.body
       const { id: userId } = ctx.user!
-      const createArticleOpt = objectFilter({ ...ctx.request.body, userId }, ['id', 'tags', 'mark'])
+      const createArticleOpt = objectFilter({ ...ctx.request.body, userId }, [
+        'id',
+        'tags',
+        'mark',
+        'type',
+      ])
+
+      // 根据文章提交类型，设置文章状态
+      let successMsg = '保存成功'
+      if (type === ECommitArticleType.SAVE) {
+        createArticleOpt.state = '0'
+        createArticleOpt.visibility = '0'
+      } else if (type === ECommitArticleType.PUBLISH) {
+        createArticleOpt.state = '1'
+        createArticleOpt.visibility = '1'
+        successMsg = '发布成功'
+      }
 
       // 校验isSticky类型，为boolean值时转为枚举类型
       if (typeof createArticleOpt.isSticky === 'boolean') {
@@ -126,14 +148,14 @@ class ArticlesController {
             createArticleOpt as ICreateArticleParams,
           )) as OkPacketParams
         ).insertId
+        // 根据文章id，将临时表的文章配图转移到主表中
         insertId && (await fileService.saveIllustrationFromTemp(mark, insertId))
       }
       // 更新tags
       tags && (await articlesService.createTagsToAtc(articleId ?? insertId, tags))
 
-      ctx.success(insertId ? { insertId } : null, { msg: '保存成功' })
+      ctx.success(insertId ? { insertId } : null, { msg: successMsg })
     } catch (error: any) {
-      console.log(error)
       ctx.fail(error)
     }
   }

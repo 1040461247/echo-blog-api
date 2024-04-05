@@ -1,11 +1,16 @@
 import { createClient } from 'redis'
 
-const redis = createClient({
+const redisClient = createClient({
   url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
-}).on('error', (err) => console.log('Redis Client Error', err))
+}).on('error', async (err) => {
+  // 错误处理和重连
+  console.error(err)
+  await redisClient.quit()
+  redisClient.connect()
+})
 
 export default async function getRedisClient() {
-  return await redis.connect()
+  return await redisClient.connect()
 }
 
 // Redis Constants
