@@ -47,7 +47,7 @@ export interface IArticleListQueryOption {
   sort?: string
 }
 
-export interface IModifiedOption {
+export interface IArticleUpdateOption {
   title?: string
   content?: string
   description?: string
@@ -142,9 +142,9 @@ class ArticlesService {
       LEFT JOIN categories c ON c.id = atc.category_id
       LEFT JOIN articles_ref_tags art ON art.article_id = atc.id
       LEFT JOIN tags ON tags.id = art.tag_id
-      ${whereQuery ? whereQuery : ''}
+      ${whereQuery}
       GROUP BY atc.id
-      ${sortQuery ? sortQuery : ''}
+      ${sortQuery}
       LIMIT ?, ?;
     `
       const [res] = (await connection.execute(statement, [
@@ -313,7 +313,7 @@ class ArticlesService {
         SELECT COUNT(*) articlesTotal
         FROM articles a
         LEFT JOIN articles_ref_tags art ON art.article_id = a.id
-        ${whereQuery ? whereQuery : ''};
+        ${whereQuery};
       `
       const [res] = (await connection.execute(statement, whereVals)) as any
       return res[0].articlesTotal
@@ -369,8 +369,8 @@ class ArticlesService {
     }
   }
 
-  async updateArticleById(articleId: number, modifiedOpt: IModifiedOption) {
-    const { updateQuery, updateVals } = optToUpdateQuery(modifiedOpt)
+  async updateArticleById(articleId: number, updateOption: IArticleUpdateOption) {
+    const { updateQuery, updateVals } = optToUpdateQuery(updateOption)
 
     try {
       const statement = `

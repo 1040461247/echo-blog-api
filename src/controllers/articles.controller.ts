@@ -43,7 +43,6 @@ class ArticlesController {
       const articlesTotal = await articlesService.getArticlesTotal(ctx.query)
       ctx.success(articleList, { total: articlesTotal })
     } catch (error: any) {
-      console.log(error)
       ctx.fail(error)
     }
   }

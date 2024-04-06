@@ -56,8 +56,8 @@ class CategoriesService {
             WHERE c.id = a.category_id
           ) articleCount
         FROM categories c
-        ${whereQuery ? whereQuery : ''}
-        ${sortQuery ? sortQuery : ''}
+        ${whereQuery}
+        ${sortQuery}
         LIMIT ?, ?;
       `
       const [res] = await connection.execute(statement, [...whereVals, offset, limit])
@@ -89,9 +89,7 @@ class CategoriesService {
   async getCategoriesTotal(queryOption: ICategoryListQueryOption) {
     try {
       const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'categories')
-      const statement = `SELECT COUNT(*) categoriesTotal FROM categories ${
-        whereQuery ? whereQuery : ''
-      };`
+      const statement = `SELECT COUNT(*) categoriesTotal FROM categories ${whereQuery};`
       const [res] = (await connection.execute(statement, whereVals)) as RowDataPacket[]
       return res[0].categoriesTotal
     } catch (error) {

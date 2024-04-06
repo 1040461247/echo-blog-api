@@ -55,8 +55,8 @@ class TagsService {
           WHERE t.id = art.tag_id
         ) articleCount
         FROM tags t
-        ${whereQuery ? whereQuery : ''}
-        ${sortQuery ? sortQuery : ''}
+        ${whereQuery}
+        ${sortQuery}
         LIMIT ?, ?;
       `
       const [res] = await connection.execute(statement, [...whereVals, offset, limit])
@@ -88,7 +88,7 @@ class TagsService {
   async getTagsTotal(queryOption: ITagListQueryOption) {
     try {
       const { whereQuery, whereVals } = optToWhereQuery(queryOption, 'tags')
-      const statement = `SELECT COUNT(*) tagsTotal FROM tags ${whereQuery ? whereQuery : ''};`
+      const statement = `SELECT COUNT(*) tagsTotal FROM tags ${whereQuery};`
       const [res] = (await connection.execute(statement, whereVals)) as RowDataPacket[]
       return res[0].tagsTotal
     } catch (error) {

@@ -14,14 +14,6 @@ export function optToWhereQuery(option: any, tableAlias: string, tagTAlias: stri
     conditionArr.push(`${tagTAlias}.tag_id IN (${tags})`)
   }
 
-  // 模糊查询字段
-  if (option.title) {
-    conditionArr.push(`${tableAlias}.title LIKE '%${option.title}%'`)
-  }
-  if (option.name) {
-    conditionArr.push(`${tableAlias}.name LIKE '%${option.name}%'`)
-  }
-
   // 时间段查询
   if (option.createTime) {
     const timeRange = JSON.parse(option.createTime)
@@ -36,22 +28,20 @@ export function optToWhereQuery(option: any, tableAlias: string, tagTAlias: stri
 
   // 生成查询语句
   // 忽略生成查询语句的字段
-  const oFileds = [
+  const ignoreFileds = [
     'current',
     'pageSize',
-    'title',
     'token ',
     'tags[]',
     'tags',
     'createTime',
     'updateTime',
     'sort',
-    'name',
   ]
-  const keys = Object.keys(option).filter((item) => !oFileds.includes(item))
+  const keys = Object.keys(option).filter((item) => !ignoreFileds.includes(item))
   for (const key of keys) {
-    whereVals.push(option[key])
-    conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} = ?`)
+    whereVals.push(`%${option[key]}%`)
+    conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} LIKE ?`)
   }
   let whereQuery = conditionArr.join(' AND ')
   // 当有查询条件时，添加WHERE关键字
@@ -67,7 +57,7 @@ export function optToSortQuery(
   tableAlias: string = '',
   notSqlFiles?: string[],
 ) {
-  if (!sortStr) return null
+  if (!sortStr) return ''
   const sortArr: string[] = []
   const sortObj = JSON.parse(sortStr)
   const sortKeys = Object.keys(sortObj)
@@ -82,7 +72,7 @@ export function optToSortQuery(
       }`,
     )
   })
-  if (sortArr.length === 0) return null
+  if (sortArr.length === 0) return ''
 
   let sortQuery = sortArr.join(', ')
   sortQuery = 'ORDER BY ' + sortQuery
@@ -94,10 +84,13 @@ export function optToUpdateQuery(option: any) {
   const updateArr: string[] = []
   const updateVals: any[] = []
   const optKeys = Object.keys(option)
+  const ignoreFiles = ['id', 'createTime', 'updateTime']
 
   for (const key of optKeys) {
-    updateVals.push(option[key])
-    updateArr.push(`${camelToUnderscore(key)} = ?`)
+    if (!ignoreFiles.includes(key)) {
+      updateVals.push(option[key])
+      updateArr.push(`${camelToUnderscore(key)} = ?`)
+    }
   }
   const updateQuery = updateArr.join(', ')
 
