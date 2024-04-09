@@ -1,6 +1,11 @@
 import camelToUnderscore from './camel-to-underscore'
 
-export function optToWhereQuery(option: any, tableAlias: string, tagTAlias: string = 'art') {
+export function optToWhereQuery(
+  option: any,
+  tableAlias: string,
+  tagTAlias: string = 'art',
+  accurateList: string[] = [],
+) {
   const conditionArr: string[] = []
   const whereVals: any[] = []
 
@@ -38,10 +43,16 @@ export function optToWhereQuery(option: any, tableAlias: string, tagTAlias: stri
     'updateTime',
     'sort',
   ]
+  const accurateFiles = ['id', ...accurateList]
   const keys = Object.keys(option).filter((item) => !ignoreFileds.includes(item))
   for (const key of keys) {
-    whereVals.push(`%${option[key]}%`)
-    conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} LIKE ?`)
+    if (accurateFiles.includes(key)) {
+      whereVals.push(option[key])
+      conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} = ?`)
+    } else {
+      whereVals.push(`%${option[key]}%`)
+      conditionArr.push(`${tableAlias}.${camelToUnderscore(key)} LIKE ?`)
+    }
   }
   let whereQuery = conditionArr.join(' AND ')
   // 当有查询条件时，添加WHERE关键字

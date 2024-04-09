@@ -1,4 +1,4 @@
-export function pageToOffset(current: number | string, pageSize: number | string) {
+export function pageToOffset(current: number | string = 1, pageSize: number | string = 1000) {
   const currentNum = Number(current)
   const pageSizeNum = Number(pageSize)
 
