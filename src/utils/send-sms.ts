@@ -24,7 +24,6 @@ export default class Client {
     // return { status: 1, msg: 1234 }
 
     const code = Client.generateOtp(4)
-
     const client = Client.createClient(
       process.env.ALIBABA_CLOUD_ACCESS_KEY_ID!,
       process.env.ALIBABA_CLOUD_ACCESS_KEY_SECRET!,

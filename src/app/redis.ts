@@ -10,7 +10,12 @@ const redisClient = createClient({
 })
 
 export default async function getRedisClient() {
-  return await redisClient.connect()
+  try {
+    await redisClient.PING()
+    return redisClient
+  } catch (error: any) {
+    return await redisClient.connect()
+  }
 }
 
 // Redis Constants
