@@ -62,6 +62,7 @@ class TagsService {
       const [res] = await connection.execute(statement, [...whereVals, offset, limit])
       return res
     } catch (error) {
+      console.error(error)
       throw new Error(DATABASE_ERROR)
     }
   }
