@@ -5,6 +5,7 @@ import type { RowDataPacket } from 'mysql2'
 import sortArticles from '../utils/sort-articles'
 import { IArticles } from '../types'
 import {
+  IDateRange,
   optToInsertQuery,
   optToSortQuery,
   optToUpdateQuery,
@@ -26,11 +27,6 @@ export enum EArticleIsSticky {
 export enum EArticleVisibility {
   NOT_VISIBLE = '0',
   VISIBLE = '1',
-}
-
-interface IDateRange {
-  startTime: string
-  endTime: string
 }
 
 export interface IArticleListQueryOption {
@@ -98,7 +94,7 @@ class ArticlesService {
       LEFT JOIN tags ON tags.id = art.tag_id
       WHERE state = '1' AND visibility = '1'
       GROUP BY atc.id
-      ORDER BY atc.is_sticky DESC, atc.id
+      ORDER BY atc.is_sticky DESC, atc.create_time DESC
       LIMIT ?, ?;
     `
       const [res] = (await connection.execute(statement, [offset, limit])) as RowDataPacket[][]

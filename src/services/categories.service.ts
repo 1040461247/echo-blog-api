@@ -2,13 +2,9 @@ import connection from '../app/database'
 import { DATABASE_ERROR } from '../config/error-types.config'
 import type { RowDataPacket } from 'mysql2'
 import { pageToOffset } from '../utils/page-to-offset'
-import { optToSortQuery, optToWhereQuery } from '../utils/gen-query'
+import { IDateRange, optToSortQuery, optToWhereQuery } from '../utils/gen-query'
 
 // Types
-interface IDateRange {
-  startTime: string
-  endTime: string
-}
 
 interface ICategoryListQueryOption {
   current: string

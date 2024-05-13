@@ -1,0 +1,5 @@
+[2024-05-05T19:28:40.753] [INFO] http - ::1 - - "OPTIONS /cms-login HTTP/1.1" 204 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+[2024-05-05T19:28:41.202] [INFO] http - ::1 - - "POST /cms-login HTTP/1.1" 200 522 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+[2024-05-05T19:28:41.223] [INFO] http - ::1 - - "OPTIONS /cms-authorized HTTP/1.1" 204 - "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+[2024-05-05T19:28:41.416] [INFO] http - ::1 - - "GET /cms-authorized HTTP/1.1" 200 93 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+[2024-05-05T19:28:41.472] [INFO] http - ::1 - - "GET /users/1 HTTP/1.1" 200 403 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"

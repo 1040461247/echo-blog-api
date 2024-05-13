@@ -1,5 +1,11 @@
 import camelToUnderscore from './camel-to-underscore'
 
+// Types
+export interface IDateRange {
+  startTime: string
+  endTime: string
+}
+
 export function optToWhereQuery(
   option: any,
   tableAlias: string,
@@ -43,8 +49,10 @@ export function optToWhereQuery(
     'updateTime',
     'sort',
   ]
-  const accurateFiles = ['id', ...accurateList]
-  const keys = Object.keys(option).filter((item) => !ignoreFileds.includes(item))
+  const accurateFiles = ['id', 'pid', ...accurateList]
+  const keys = Object.keys(option).filter((item) => {
+    return !ignoreFileds.includes(item) && option[item]
+  })
   for (const key of keys) {
     if (accurateFiles.includes(key)) {
       whereVals.push(option[key])
