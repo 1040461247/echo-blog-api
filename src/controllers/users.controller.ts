@@ -2,16 +2,25 @@ import fs from 'fs'
 import userService from '../services/users.service'
 import { AVATAR_PATH } from '../config/filepath.config'
 import type { DefaultContext } from 'koa'
-import type { RowDataPacket } from 'mysql2'
 import type { IFileAvatar, IUsers } from '../types'
 import getUserSystemInfo from '../utils/get-user-system-info'
 import { signToken } from '../utils/authorization'
+import encryptPhone from '../utils/encrypt-phone'
 
 class UsersController {
   async getUserList(ctx: DefaultContext) {
     try {
-      const queryRes = (await userService.getUserList()) as IUsers[]
-      ctx.success(queryRes)
+      // 用户信息
+      const queryRes = (await userService.getUserList(ctx.query)) as any[]
+      const userRes = queryRes.map((item) => {
+        item.phoneNum = encryptPhone(item.phoneNum)
+        item.roles = JSON.parse(item.roles)
+        return item
+      })
+      const usersTotal = await userService.getUsersTotal(ctx.query)
+
+      // 角色信息
+      ctx.success(userRes, { total: usersTotal })
     } catch (error: any) {
       ctx.fail(error)
     }
@@ -35,8 +44,9 @@ class UsersController {
   async getUserById(ctx: DefaultContext) {
     try {
       const { userId } = ctx.params
-      const [userInfo] = (await userService.getUserById(userId)) as RowDataPacket[]
+      const [userInfo] = (await userService.getUserById(userId)) as any[]
       delete userInfo.password
+      userInfo.phoneNum = encryptPhone(userInfo.phoneNum)
       ctx.success(userInfo)
     } catch (error: any) {
       ctx.fail(error)

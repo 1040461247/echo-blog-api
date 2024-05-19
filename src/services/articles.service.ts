@@ -143,11 +143,7 @@ class ArticlesService {
       ${sortQuery}
       LIMIT ?, ?;
     `
-      const [res] = (await connection.execute(statement, [
-        ...whereVals,
-        offset,
-        limit,
-      ])) as RowDataPacket[][]
+      const [res] = await connection.execute(statement, [...whereVals, offset, limit])
       return res
     } catch (error) {
       console.log(error)
