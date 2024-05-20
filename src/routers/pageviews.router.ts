@@ -1,7 +1,8 @@
 import KoaRouter from '@koa/router'
 import pageviewsController from '../controllers/pageviews.controller'
+import { BASE_PATH } from '.'
 
-const pageviewsRouter = new KoaRouter({ prefix: '/pageviews' })
+const pageviewsRouter = new KoaRouter({ prefix: `${BASE_PATH}/pageviews` })
 const { createPv, getPv, getUv } = pageviewsController
 
 /**

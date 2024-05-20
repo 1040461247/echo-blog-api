@@ -3,6 +3,8 @@ import path from 'path'
 import type Koa from 'koa'
 import type KoaRouter from '@koa/router'
 
+export const BASE_PATH = '/api'
+
 function useRoutes(app: Koa) {
   // 读取并注册当前目录下所有路由
   fs.readdirSync(__dirname).forEach((file) => {

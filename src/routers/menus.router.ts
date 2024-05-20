@@ -1,10 +1,11 @@
 import KoaRouter from '@koa/router'
 import menuController from '../controllers/menus.controller'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { BASE_PATH } from '.'
 
 const { getMenuList, updateMenuById, removeMenuById } = menuController
 
-const menuRouter = new KoaRouter({ prefix: '/menus' })
+const menuRouter = new KoaRouter({ prefix: `${BASE_PATH}/menus` })
 
 /**
  * @swagger

@@ -8,8 +8,9 @@ import {
   verifyPhone,
 } from '../middlewares/auth.middleware'
 import { updateUserSystemInfo, updateUserLoginTime } from '../middlewares/users.middleware'
+import { BASE_PATH } from '.'
 
-const authRouter = new KoaRouter()
+const authRouter = new KoaRouter({prefix: BASE_PATH})
 const { loginByAccount, validated, sendedOtp, loginByPhone, logout } = authController
 
 /**

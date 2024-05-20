@@ -2,8 +2,9 @@ import KoaRouter from '@koa/router'
 import usersController from '../controllers/users.controller'
 import { verifyRegisterInfo, encrypPwd, checkForUserName } from '../middlewares/users.middleware'
 import { verifyAuth } from '../middlewares/auth.middleware'
+import { BASE_PATH } from '.'
 
-const usersRouter = new KoaRouter({ prefix: '/users' })
+const usersRouter = new KoaRouter({ prefix: `${BASE_PATH}/users` })
 const { createUser, getUserList, getAvatarByUserId, getUserById, updateUser } = usersController
 
 /**

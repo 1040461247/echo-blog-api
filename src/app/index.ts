@@ -16,7 +16,7 @@ app.use(responseHandle)
 app.use(bodyparser())
 app.use(
   koaSwagger({
-    routePrefix: '/api',
+    routePrefix: '/api/doc',
     swaggerOptions: {
       spec: swaggerSpec,
     },

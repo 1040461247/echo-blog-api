@@ -8,8 +8,9 @@ import {
   illustrationOffsiteHandler,
 } from '../middlewares/file.middleware'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { BASE_PATH } from '.'
 
-const fileRouter = new KoaRouter({ prefix: '/upload' })
+const fileRouter = new KoaRouter({ prefix: `${BASE_PATH}/upload` })
 const {
   createAvatar,
   createIllustration,

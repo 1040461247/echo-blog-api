@@ -2,8 +2,9 @@ import KoaRouter from '@koa/router'
 import tagsController from '../controllers/tags.controller'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 import { checkForTagExists } from '../middlewares/tags.middleware'
+import { BASE_PATH } from '.'
 
-const tagsRouter = new KoaRouter({ prefix: '/tags' })
+const tagsRouter = new KoaRouter({ prefix: `${BASE_PATH}/tags` })
 const { createTag, getTagList, getTagListQuery, removeTag, getTagById, updateTagById } =
   tagsController
 

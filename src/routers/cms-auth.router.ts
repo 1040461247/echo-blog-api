@@ -3,8 +3,9 @@ import cmsAuthController from '../controllers/cms-auth.controller'
 import { verifyAccount } from '../middlewares/auth.middleware'
 import { updateUserSystemInfo, updateUserLoginTime } from '../middlewares/users.middleware'
 import { verifyAdmin, verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { BASE_PATH } from '.'
 
-const cmsAuthRouter = new KoaRouter()
+const cmsAuthRouter = new KoaRouter({prefix: BASE_PATH})
 const { login, validated } = cmsAuthController
 
 /**

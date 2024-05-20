@@ -2,8 +2,9 @@ import KoaRouter from '@koa/router'
 import categoriesController from '../controllers/categories.controller'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
 import { checkForCategoryExists } from '../middlewares/categories.middleware'
+import { BASE_PATH } from '.'
 
-const categoriesRouter = new KoaRouter({ prefix: '/categories' })
+const categoriesRouter = new KoaRouter({ prefix: `${BASE_PATH}/categories` })
 const {
   createCategory,
   getCategoryList,

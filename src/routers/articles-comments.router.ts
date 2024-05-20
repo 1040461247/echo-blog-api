@@ -6,8 +6,9 @@ import {
   recordMessageOfLikeComment,
   recordMessageOfReply,
 } from '../middlewares/message-record.middleware'
+import { BASE_PATH } from '.'
 
-const ArticlesCommentsRouter = new KoaRouter({ prefix: '/articles-comments' })
+const ArticlesCommentsRouter = new KoaRouter({ prefix: `${BASE_PATH}/articles-comments` })
 const {
   createComment,
   createReply,

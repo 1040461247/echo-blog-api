@@ -1,8 +1,9 @@
 import KoaRouter from '@koa/router'
 import rolesController from '../controllers/roles.controller'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { BASE_PATH } from '.'
 
-const rolesRouter = new KoaRouter({ prefix: '/roles' })
+const rolesRouter = new KoaRouter({ prefix: `${BASE_PATH}/roles` })
 const { getRoleList, getMenuKeysByRoleId, updateMenusByRoleId } = rolesController
 
 /**

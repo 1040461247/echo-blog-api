@@ -1,8 +1,9 @@
 import KoaRouter from '@koa/router'
 import messageRecordController from '../controllers/message-record.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
+import { BASE_PATH } from '.'
 
-const messageRecordRouter = new KoaRouter({ prefix: '/message-record' })
+const messageRecordRouter = new KoaRouter({ prefix: `${BASE_PATH}/message-record` })
 const { getMsgListByUserId, clearUnread, getMsgTotal } = messageRecordController
 
 /**

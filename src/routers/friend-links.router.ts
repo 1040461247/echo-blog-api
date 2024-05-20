@@ -1,8 +1,9 @@
 import KoaRouter from '@koa/router'
 import friendLinksController from '../controllers/friend-links.controller'
 import { verifyAuth } from '../middlewares/auth.middleware'
+import { BASE_PATH } from '.'
 
-const friendLinksRouter = new KoaRouter({ prefix: '/friend-links' })
+const friendLinksRouter = new KoaRouter({ prefix: `${BASE_PATH}/friend-links` })
 const { createFriendAudit, approveFriendAudit, getFriendList } = friendLinksController
 
 /**

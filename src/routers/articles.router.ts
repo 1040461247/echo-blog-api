@@ -2,8 +2,9 @@ import KoaRouter from '@koa/router'
 import articlesController from '../controllers/articles.controller'
 import { verifyPermission } from '../middlewares/auth.middleware'
 import { verifyAuthCms } from '../middlewares/cms-auth.middleware'
+import { BASE_PATH } from '.'
 
-const articlesRouter = new KoaRouter({ prefix: '/articles' })
+const articlesRouter = new KoaRouter({ prefix: `${BASE_PATH}/articles` })
 
 const {
   getArticleList,
