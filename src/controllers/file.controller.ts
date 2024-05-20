@@ -100,7 +100,9 @@ class FileController {
       )) as IFileIllustration
       if (articleCover) {
         // 封面已存在，删除源文件并更新
-        await fs.unlink(`${ILLUSTRATION_PATH}/${articleCover.filename}`)
+        await fs.unlink(`${ILLUSTRATION_PATH}/${articleCover.filename}`).catch((err) => {
+          console.log('原文章封面不存在', err)
+        })
         await fileService.updateCover(filename, mimetype, size, articleId)
         ctx.success(null, { msg: '文章封面已更新' })
       } else {
